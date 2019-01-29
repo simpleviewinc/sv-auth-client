@@ -19,6 +19,11 @@ async function query({ query, variables, url }) {
 		throw e;
 	}
 	
+	if (response.data.errors !== undefined) {
+		console.log(response.data.errors);
+		throw new Error("GraphQL returned errors.");
+	}
+	
 	return response.data.data;
 }
 
