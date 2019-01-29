@@ -1,0 +1,22 @@
+{
+	"name" : "@simpleview/auth-client",
+	"version" : "1.0.0",
+	"description" : "Client for communicating with auth server-side on behalf of a token",
+	"author" : "Owen Allen <owenallenaz@gmail.com>",
+	"devDependencies" : {
+		"mocha" : "5.2.0"
+	},
+	"dependencies" : {
+		"axios" : "0.18.0"
+	},
+	"main" : "src/index.js",
+	"scripts" : {
+		"test" : "mocha testing",
+		"docker" : "./docker/build && ./docker/run || true"
+	},
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/simpleviewinc/sv-npm-assertlib"
+	},
+	"license" : "MIT"
+}
