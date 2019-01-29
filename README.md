@@ -40,6 +40,23 @@ const user = authClient.getUser({
 
 If you are finished with an AuthClient instance, call `authClient.close()` in order to shut it down. Generally this is only needed in unit tests, otherwise there is an internal `setInterval` which will keep the process open.
 
+## getTokenFromHeaders
+
+Extracts the token from the `authorization` header.
+
+```
+const { getTokenFromHeaders } = require("@simpleview/auth-client");
+
+const server = new ApolloServer({
+	...
+	context: ({ req }) => {
+		return {
+			token : getTokenFromHeaders(req.headers)
+		};
+	}
+});
+```
+
 ## GraphServer
 
 `GraphServer` is an API interface to communicate with the graphQL server to make it a little bit easier to call the various methods.
