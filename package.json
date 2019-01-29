@@ -1,7 +1,7 @@
 {
 	"name" : "@simpleview/auth-client",
 	"version" : "1.0.0",
-	"description" : "Client for communicating with auth server-side on behalf of a token",
+	"description" : "Client for communicating with sv-auth",
 	"author" : "Owen Allen <owenallenaz@gmail.com>",
 	"devDependencies" : {
 		"mocha" : "5.2.0"
