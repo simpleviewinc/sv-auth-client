@@ -11,7 +11,7 @@ npm install @simpleview/auth-client
 
 `AuthClient` is a class for converting a `token` into an `auth_user` with permissions associated with an `acct_id`.
 
-```
+```js
 const { AuthClient } = require("@simpleview/auth-client");
 // the GRAPH_URL is the graphQL server that you wish to communicate with. Get the proper URL from the sv-auth repository to align with the appropriate live/dev/staging resource.
 const authClient = new AuthClient({ graphUrl : GRAPH_URL });
@@ -29,7 +29,7 @@ Generally you will want to make this call very early in your GraphQL stack in or
 
 Returns `auth_user`.
 
-```
+```js
 const user = authClient.getUser({
 	token,
 	acct_id : "0"
@@ -44,7 +44,7 @@ If you are finished with an AuthClient instance, call `authClient.close()` in or
 
 Extracts the token from the `authorization` header.
 
-```
+```js
 const { getTokenFromHeaders } = require("@simpleview/auth-client");
 
 const server = new ApolloServer({
@@ -71,7 +71,7 @@ The easiest way to find the endpoints on GraphServer is to either check the `src
 
 Examples
 
-```
+```js
 const result = await graphServer.users.login({
 	email : "x",
 	password : "y",
