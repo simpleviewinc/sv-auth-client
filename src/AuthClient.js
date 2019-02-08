@@ -38,7 +38,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 	const cacheKey = `${token}_${acct_id}`;
 	const cacheEntry = cache[cacheKey];
 	if (cacheEntry !== undefined) {
-		const cacheResult = await graphServer.users.check_token_cache({
+		const cacheResult = await graphServer.auth.check_token_cache({
 			token,
 			date : cacheEntry.created,
 			acct_id,
@@ -50,7 +50,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 		}
 	}
 	
-	const userResult = await graphServer.users.current({
+	const userResult = await graphServer.auth.current({
 		token,
 		acct_id,
 		fields : `

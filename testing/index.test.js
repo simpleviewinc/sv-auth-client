@@ -12,7 +12,7 @@ describe(__filename, function() {
 	
 	before(async function() {
 		await graphServer.test.reset_data();
-		login1 = await graphServer.users.login({
+		login1 = await graphServer.auth.login({
 			email : "test0@test.com",
 			password : "test",
 			fields : `success message token`
@@ -76,14 +76,17 @@ describe(__filename, function() {
 		const upsertResult = await graphServer.users.upsert({
 			input : {
 				id : user.id,
-				acct_id : user.acct_id,
 				firstname : "Changed",
 				lastname : user.lastname,
 				email : user.email,
 				roles_ids : user.roles.map(val => val.id),
 				active : user.active
 			},
-			fields : `success message`
+			fields : `success message`,
+			context : {
+				acct_id : "0",
+				token : login1.token
+			}
 		});
 		
 		const user3 = await authClient.getUser({

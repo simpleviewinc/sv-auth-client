@@ -1,27 +1,27 @@
 const axios = require("axios");
 
-async function query({ query, variables, url }) {
+async function query({ query, variables, url, token }) {
 	let response;
 	try {
 		response = await axios({
 			url,
 			method : "post",
-			headers : {
-				"content-type": "application/json"
-			},
+			headers : token ? {
+				Authorization : `Bearer ${token}`
+			} : undefined,
 			data : {
 				query,
 				variables
 			}
 		});
 	} catch(e) {
+		console.log("e", e);
 		console.log(e.response.data.errors);
 		throw e;
 	}
 	
 	if (response.data.errors !== undefined) {
-		console.log(response.data.errors);
-		throw new Error("GraphQL returned errors.");
+		throw new Error(response.data.errors.map(val => val.message).join(", "));
 	}
 	
 	return response.data.data;
