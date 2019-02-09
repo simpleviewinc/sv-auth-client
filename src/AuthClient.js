@@ -58,15 +58,10 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 			success
 			message
 			doc {
-				id
 				acct_id
 				firstname
 				lastname
 				email
-				roles {
-					id
-					name
-				}
 				permissionJson
 				active
 			}
