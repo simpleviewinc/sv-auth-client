@@ -39,10 +39,12 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 	const cacheEntry = cache[cacheKey];
 	if (cacheEntry !== undefined) {
 		const cacheResult = await graphServer.auth.check_token_cache({
-			token,
 			date : cacheEntry.created,
 			acct_id,
-			fields : `success message`
+			fields : `success message`,
+			context : {
+				token
+			}
 		});
 		
 		if (cacheResult.success === true) {
@@ -51,7 +53,6 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 	}
 	
 	const userResult = await graphServer.auth.current({
-		token,
 		acct_id,
 		fields : `
 			success
@@ -69,7 +70,10 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 				permissionJson
 				active
 			}
-		`
+		`,
+		context : {
+			token
+		}
 	});
 	
 	if (userResult.success === false) {

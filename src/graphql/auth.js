@@ -1,25 +1,28 @@
 const { query } = require("../utils.js");
 
 class Auth {
-	constructor({ graphUrl, name }) {
+	constructor({ graphUrl, name, context }) {
 		this.graphUrl = graphUrl;
+		this.context = context;
 	}
-	async current({ token, acct_id, fields }) {
+	async current({ acct_id, fields, context }) {
+		context = context || this.context;
+		
 		const result = await query({
 			query : `
-				query($token: String!, $acct_id: String!) {
+				query($acct_id: String!) {
 					auth {
-						current(token: $token, acct_id: $acct_id) {
+						current(acct_id: $acct_id) {
 							${fields}
 						}
 					}
 				}
 			`,
 			variables : {
-				token,
 				acct_id
 			},
-			url : this.graphUrl
+			url : this.graphUrl,
+			token : context.token
 		});
 		
 		return result.auth.current;
@@ -84,23 +87,25 @@ class Auth {
 		
 		return result.auth.login_google;
 	}
-	async check_token_cache({ token, date, acct_id, fields }) {
+	async check_token_cache({ date, acct_id, fields, context }) {
+		context = context || this.context;
+		
 		const result = await query({
 			query : `
-				query($token: String!, $date: auth_date!, $acct_id: String!) {
+				query($date: auth_date!, $acct_id: String!) {
 					auth {
-						check_token_cache(token: $token, date: $date, acct_id: $acct_id) {
+						check_token_cache(date: $date, acct_id: $acct_id) {
 							${fields}
 						}
 					}
 				}
 			`,
 			variables : {
-				token,
 				date,
 				acct_id
 			},
-			url : this.graphUrl
+			url : this.graphUrl,
+			token : context.token
 		});
 		
 		return result.auth.check_token_cache;

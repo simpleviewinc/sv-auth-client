@@ -1,10 +1,10 @@
 const files = [
 	"accounts",
+	"auth",
 	"products",
 	"roles",
-	"users",
-	"auth",
-	"test"
+	"test",
+	"users"
 ]
 
 function GraphServer({ graphUrl, context = {} }) {
