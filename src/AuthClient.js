@@ -3,11 +3,11 @@ const privateMap = new WeakMap();
 
 function AuthClientPrivate({ graphUrl, cacheDuration = 1000 * 60 * 60 }) {
 	this.graphServer = new GraphServer({ graphUrl });
-	this.cache = {};
+	const cache = this.cache = {};
 	this.interval = setInterval(() => {
 		const now = Date.now();
 		for(var i in cache) {
-			if (cache[i].created + (1000 * 60 * 60) < now) {
+			if (cache[i].created + cacheDuration > now) {
 				delete cache[i];
 			}
 		}
@@ -79,7 +79,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 	
 	cache[cacheKey] = {
 		user : userResult.doc,
-		created : new Date()
+		created : Date.now()
 	}
 	
 	return userResult.doc;
