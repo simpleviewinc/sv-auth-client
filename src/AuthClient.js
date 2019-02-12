@@ -39,7 +39,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 	const cacheEntry = cache[cacheKey];
 	if (cacheEntry !== undefined) {
 		const cacheResult = await graphServer.auth.check_token_cache({
-			date : cacheEntry.created,
+			date : new Date(cacheEntry.created).toISOString(),
 			acct_id,
 			fields : `success message`,
 			context : {
@@ -58,6 +58,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 			success
 			message
 			doc {
+				id
 				acct_id
 				firstname
 				lastname

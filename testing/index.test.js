@@ -2,7 +2,7 @@ const { query } = require("../src/utils");
 const { AuthClient, GraphServer } = require("../");
 const assert = require("assert");
 
-const GRAPH_URL = "http://graphql.kube.simpleview.io/";
+const GRAPH_URL = "https://graphql.kube.simpleview.io/";
 
 const graphServer = new GraphServer({ graphUrl : GRAPH_URL });
 const authClient = new AuthClient({ graphUrl : GRAPH_URL });
@@ -39,7 +39,6 @@ describe(__filename, function() {
 			firstname : "Test",
 			lastname : "User",
 			email : "test0@test.com",
-			roles : [{ id : "000000000000000000000030", name : "All" }],
 			permissionJson : JSON.stringify({ cms : true }),
 			active : true
 		};
@@ -79,7 +78,6 @@ describe(__filename, function() {
 				firstname : "Changed",
 				lastname : user.lastname,
 				email : user.email,
-				roles_ids : user.roles.map(val => val.id),
 				active : user.active
 			},
 			fields : `success message`,
