@@ -1,4 +1,5 @@
 const GraphServer = require("./GraphServer");
+const User = require("./User");
 const privateMap = new WeakMap();
 
 function AuthClientPrivate({ graphUrl, cacheDuration = 1000 * 60 * 60 }) {
@@ -59,6 +60,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 			message
 			doc {
 				id
+				sv
 				acct_id
 				firstname
 				lastname
@@ -78,12 +80,14 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 		return;
 	}
 	
+	const user = new User(userResult.doc);
+	
 	cache[cacheKey] = {
-		user : userResult.doc,
+		user,
 		created : Date.now()
 	}
 	
-	return userResult.doc;
+	return user;
 }
 
 module.exports = AuthClient;

@@ -1,5 +1,6 @@
 const AuthClient = require("./AuthClient");
 const GraphServer = require("./GraphServer");
+const User = require("./User");
 
 function getTokenFromHeaders(headers) {
 	if (!headers.authorization) {
@@ -12,5 +13,6 @@ function getTokenFromHeaders(headers) {
 module.exports = {
 	AuthClient,
 	getTokenFromHeaders,
-	GraphServer
+	GraphServer,
+	User
 }

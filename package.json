@@ -4,6 +4,7 @@
 	"description" : "Client for communicating with sv-auth",
 	"author" : "Owen Allen <owenallenaz@gmail.com>",
 	"devDependencies" : {
+		"@simpleview/mochalib" : "1.0.1",
 		"mocha" : "5.2.0"
 	},
 	"dependencies" : {
