@@ -1,17 +1,21 @@
-# sv-auth-client
-Client for communicating with sv-auth
+# sv-graphql-client
+Client for communicating with sv-graphql
 
 # installation
 
 ```
-npm install @simpleview/auth-client
+npm install @simpleview/sv-graphql-client
 ```
 
-# Usage in GraphQL
+# AuthClient
+
+The `AuthClient` class is for communicating with the authentication system which provides some caching and ease of use for working with `User` objects.
+
+## Usage in GraphQL Server-side
 
 Add the token from the header into your context.
 ```js
-const { getTokenFromHeaders } = require("@simpleview/auth-client");
+const { getTokenFromHeaders } = require("@simpleview/sv-graphql-client");
 const server = new ApolloServer({
 	...
 	context: ({ req }) => {
@@ -25,7 +29,7 @@ const server = new ApolloServer({
 
 In a resolver utilize `AuthClient.getUser()` to convert that token into a user. If you look at the `sv-auth` project you can see an example of this pattern. In that project TODO ADD URL, `admin` requires an acct_id and all child-resolvers will have the user already attached to the context.
 
-# API
+## API
 
 ## AuthClient
 
