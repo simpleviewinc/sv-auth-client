@@ -1,21 +1,22 @@
-# sv-graphql-client
-Client for communicating with sv-graphql
+# sv-auth-client
 
-# installation
+Client for communicating with sv-auth. This npm package contains classes and helpers for communicating with the sv-auth graphQL system.
+
+There are 2 primary use-cases for `sv-auth-client`. One is in converting a `token` from GraphQL into a `User` so you can verify permission, the other is when wanting to access the `auth` or `admin` graphQL prefixes. For the `token` conversion, utilize `AuthClient` class. For the graphQL library utilize the `AuthPrefix` and `AdminPrefix`.
+
+# Installation
 
 ```
-npm install @simpleview/sv-graphql-client
+npm install @simpleview/sv-auth-client
 ```
-
-# AuthClient
-
-The `AuthClient` class is for communicating with the authentication system which provides some caching and ease of use for working with `User` objects.
 
 ## Usage in GraphQL Server-side
 
+For your GraphQL endpoint, if you require authentication, which you should, you will need to extract the token from the server headers passed from `sv-graphql`.
+
 Add the token from the header into your context.
 ```js
-const { getTokenFromHeaders } = require("@simpleview/sv-graphql-client");
+const { getTokenFromHeaders } = require("@simpleview/sv-auth-client");
 const server = new ApolloServer({
 	...
 	context: ({ req }) => {
@@ -27,23 +28,34 @@ const server = new ApolloServer({
 });
 ```
 
-In a resolver utilize `AuthClient.getUser()` to convert that token into a user. If you look at the `sv-auth` project you can see an example of this pattern. In that project TODO ADD URL, `admin` requires an acct_id and all child-resolvers will have the user already attached to the context.
+Next once the token is extracted, you will need to convert that token into a user. In order to convert a token into a user you will need the `token` and an `acct_id`. How you do this depends on the semantics of your GraphQL routes.
 
-## API
+```js
+const { AuthClient } = require("@simpleview/sv-auth-client");
+const authClient = new AuthClient({ graphUrl : GRAPH_URL });
+
+... in a resolver
+const user = await authClient.getUser({
+	token : "X",
+	acct_id : "Y"
+});
+```
+
+An example of this is in the `sv-auth` repo in it's [GraphQL admin Query and Mutation resolvers](https://github.com/simpleviewinc/sv-auth/blob/master/containers/graphql/lib/graphql/root_admin.js). In utilizes `processToken` for both Mutation and Query to verify the token is passed. In that case, it has a filter argument of acct_id in order to recurse deeper into the GraphQL tree. In your case, you will need a real graphUrl, this only uses a localhost URL because it is the auth system querying itself.
+
+# Package API
 
 ## AuthClient
 
-`AuthClient` is a class for converting a `token` and an `acct_id` into an `auth_user` with permissions.
+The `AuthClient` class is for communicating with the authentication system which provides some caching and ease of use for working with `User` objects.
 
-```js
-const { AuthClient } = require("@simpleview/auth-client");
-// the GRAPH_URL is the graphQL server that you wish to communicate with. Get the proper URL from the sv-auth repository to align with the appropriate live/dev/staging resource.
-const authClient = new AuthClient({ graphUrl : GRAPH_URL });
-```
+* args
+	* graphUrl - The URL of graphQL server that you wish to communicate with. Most implementations should likely point to the live graphQL endpoint at https://graphql.simpleviewinc.com/.
+	* cacheDuration - The duration of how long cache entries should remain in the AuthClient cache. Defaults to 1 hour, generally you should not pass this setting unless unit testing.
 
 ### AuthClient.getUser
 
-This method wraps the call to `auth.users_current` in a caching layer to ensure that it's optimal performance and is properly updating if a user's permissions have changed.
+This method wraps the call to `auth.users_current` in a caching layer to ensure that it's performant and is properly updating if a user's permissions have changed.
 
 Generally you will want to make this call very early in your GraphQL stack in order to make the user available on context for all calls to access.
 
@@ -69,8 +81,7 @@ If you are finished with an AuthClient instance, call `authClient.close()` in or
 Extracts the token from the `authorization` header.
 
 ```js
-const { getTokenFromHeaders } = require("@simpleview/auth-client");
-
+const { getTokenFromHeaders } = require("@simpleview/sv-auth-client");
 const server = new ApolloServer({
 	...
 	context: ({ req }) => {
@@ -81,51 +92,54 @@ const server = new ApolloServer({
 });
 ```
 
-## GraphServer
+## AdminPrefix
 
-`GraphServer` is an API interface to communicate with the auth/admin system's graphQL server to make it a little bit easier to call the various methods.
-
-
-* args
-	* graphUrl - string - Fully qualified URL pointing to the graphURL server.
-	* context - object - Context object used for handling token/acct_id
-		* acct_id - string - The acct_id that the user is attempting to access. `acct_id` is required for any endpoints on `admin`.
-		* token - string - The token returned from the auth system. Token is required for accessing any of the non-login mechanics.
-
-If you need to set the context at run-time, you can manually update the context via setting `graphServer.context.acct_id = "x"`. You cannot set the `context` key to a new object or it will not function, manually updated or `Object.assign` you're changes in.
-
-```
-const { GraphServer } = require("@simpleview/auth-client");
-// the GRAPH_URL is the graphQL server that you wish to communicate with. Get the proper URL from the sv-auth repository to align with the appropriate live/dev/staging resource.
-const graphServer = new GraphServer({
-	graphUrl : GRAPH_URL
-});
-```
-
-The easiest way to find the endpoints on GraphServer is to either check the `src/graphql` or simply new the instance and console log.
-
-Examples
+`AdminPrefix` can be loaded into the `sv-graphql-client` `GraphServer` to use as a client library for accessing `admin` in GraphQL.
 
 ```js
-const result = await graphServer.users.login({
-	email : "x",
-	password : "y",
-	fields : "success message"
-});
-
-const result = await graphServer.roles.find({
-	filter : {
-		acct_id : "0"
-	},
-	fields : `
-		docs {
-			id
-			name
-			...
-		}
-		count
-	`
-});
+const { AdminPrefix } = require("@simpleview/sv-auth-client");
+const { GraphServer } = require("@simpleview/sv-graphql-client");
+const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AdminPrefix] });
 ```
 
-For the available fields on each call you can reference the GraphQL schema via the schema browser.
+## AuthPrefix
+
+`AdminPrefix` can be loaded into the `sv-graphql-client` `GraphServer` to use as a client library for accessing `auth` in GraphQL.
+
+```js
+const { AuthPrefix } = require("@simpleview/sv-auth-client");
+const { GraphServer } = require("@simpleview/sv-graphql-client");
+const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AuthPrefix] });
+```
+
+## User
+
+`User` is is returned by `AuthClient.getUser` but it can also be used without `AuthClient` when you want to convert the return from `auth.current` into a user which you wish to check permissions on.
+
+```js
+const { User } = require("@simpleview/sv-auth-client");
+const result = await graphServer.auth.current({
+	acct_id : "0",
+	fields : `
+		success
+		message
+		doc {
+			permissionJson
+		}
+	`
+});
+const user = new User(result.doc);
+user.can(["some.perm.name"]);
+```
+
+### User.can
+
+* perms - array of strings - Returns boolean whether user has all requested permissions.
+
+```js
+const allow = user.can(["cms.something.another", "cms.another.permission"]);
+```
+
+### User.toPlain
+
+Convert the `User` object back to a plain JS object.

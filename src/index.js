@@ -1,5 +1,6 @@
 const AuthClient = require("./AuthClient");
-const GraphServer = require("./GraphServer");
+const AuthPrefix = require("./prefixes/AuthPrefix");
+const AdminPrefix = require("./prefixes/AdminPrefix");
 const User = require("./User");
 
 function getTokenFromHeaders(headers) {
@@ -12,7 +13,8 @@ function getTokenFromHeaders(headers) {
 
 module.exports = {
 	AuthClient,
+	AuthPrefix,
+	AdminPrefix,
 	getTokenFromHeaders,
-	GraphServer,
 	User
 }

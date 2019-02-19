@@ -1,4 +1,4 @@
-const { query, nullToUndefined } = require("../../utils.js");
+const { query, nullToUndefined } = require("@simpleview/sv-graphql-client");
 
 class GraphAdminApi {
 	constructor({ graphUrl, name, graphServer }) {

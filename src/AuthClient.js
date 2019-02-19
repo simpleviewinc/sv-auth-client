@@ -1,8 +1,9 @@
-const GraphServer = require("./GraphServer");
+const { GraphServer } = require("@simpleview/sv-graphql-client");
+const AuthPrefix = require("./prefixes/AuthPrefix");
 const User = require("./User");
 
 function AuthClient({ graphUrl, cacheDuration = 1000 * 60 * 60 }) {
-	this._graphServer = new GraphServer({ graphUrl, prefixes : ["auth"] });
+	this._graphServer = new GraphServer({ graphUrl, prefixes : [AuthPrefix] });
 	this._cache = {};
 	this._interval = setInterval(() => {
 		const now = Date.now();

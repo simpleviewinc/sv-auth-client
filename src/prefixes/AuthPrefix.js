@@ -1,8 +1,10 @@
 const Accounts = require("./auth/accounts");
-const { query } = require("../utils");
+const { query } = require("@simpleview/sv-graphql-client");
 
 class AuthPrefix {
 	constructor({ graphUrl, graphServer }) {
+		this.name = "auth";
+		
 		this._graphUrl = graphUrl;
 		this._graphServer = graphServer;
 		

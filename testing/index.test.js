@@ -1,11 +1,11 @@
-const { query } = require("../src/utils");
-const { AuthClient, GraphServer, User } = require("../");
+const { query, GraphServer } = require("@simpleview/sv-graphql-client");
+const { AuthClient, User, AdminPrefix, AuthPrefix } = require("../");
 const assert = require("assert");
 const mochaLib = require("@simpleview/mochalib");
 
 const GRAPH_URL = "https://graphql.kube.simpleview.io/";
 
-const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : ["admin", "auth"] });
+const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AdminPrefix, AuthPrefix] });
 const authClient = new AuthClient({ graphUrl : GRAPH_URL });
 
 describe(__filename, function() {
@@ -194,6 +194,20 @@ describe(__filename, function() {
 					},
 					can : ["cms.nav.write", "crm.accounts.read"],
 					allow : true
+				}
+			},
+			{
+				name : "check non-leaf invalid",
+				args : {
+					json : {
+						cms : {
+							nav : {
+								write : true
+							}
+						}
+					},
+					can : ["cms"],
+					allow : false
 				}
 			}
 		]
