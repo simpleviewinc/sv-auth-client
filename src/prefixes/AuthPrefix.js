@@ -1,4 +1,4 @@
-const Accounts = require("./auth/accounts");
+const Accounts = require("./auth/Accounts");
 const { query } = require("@simpleview/sv-graphql-client");
 
 class AuthPrefix {

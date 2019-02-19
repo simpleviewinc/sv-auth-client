@@ -1,6 +1,6 @@
-const Products = require("./admin/products");
-const Roles = require("./admin/roles");
-const Users = require("./admin/users");
+const Products = require("./admin/Products");
+const Roles = require("./admin/Roles");
+const Users = require("./admin/Users");
 
 const apis = {
 	products : Products,
