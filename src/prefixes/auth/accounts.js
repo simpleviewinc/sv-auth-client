@@ -1,12 +1,12 @@
-const { query, nullToUndefined } = require("../utils.js");
+const { query, nullToUndefined } = require("../../utils.js");
 
 class Accounts {
-	constructor({ graphUrl, context }) {
-		this.graphUrl = graphUrl;
-		this.context = context;
+	constructor({ graphUrl, graphServer }) {
+		this._graphUrl = graphUrl;
+		this._graphServer = graphServer;
 	}
 	async find({ filter, options, fields, context }) {
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const variables = {
 			filter,
@@ -24,7 +24,7 @@ class Accounts {
 				}
 			`,
 			variables,
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		
@@ -35,7 +35,7 @@ class Accounts {
 		return returnData;
 	}
 	async upsert({ input, fields, context }) {
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const variables = {
 			input
@@ -52,16 +52,18 @@ class Accounts {
 				}
 			`,
 			variables,
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		
 		return response.auth.accounts_upsert;
 	}
 	async remove({ filter, fields, context }) {
+		throw new Error("BROKEN NOT IMPLEMENTED!");
+		
 		const method = `${this.name}_remove`;
 		
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const variables = {
 			filter,
@@ -79,7 +81,7 @@ class Accounts {
 				}
 			`,
 			variables,
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 	}

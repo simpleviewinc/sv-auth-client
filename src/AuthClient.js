@@ -1,45 +1,38 @@
 const GraphServer = require("./GraphServer");
 const User = require("./User");
-const privateMap = new WeakMap();
 
-function AuthClientPrivate({ graphUrl, cacheDuration = 1000 * 60 * 60 }) {
-	this.graphServer = new GraphServer({ graphUrl });
-	const cache = this.cache = {};
-	this.interval = setInterval(() => {
+function AuthClient({ graphUrl, cacheDuration = 1000 * 60 * 60 }) {
+	this._graphServer = new GraphServer({ graphUrl, prefixes : ["auth"] });
+	this._cache = {};
+	this._interval = setInterval(() => {
 		const now = Date.now();
-		for(var i in cache) {
-			if (cache[i].created + cacheDuration > now) {
-				delete cache[i];
+		for(var i in this._cache) {
+			if (this._cache[i].created + cacheDuration > now) {
+				delete this._cache[i];
 			}
 		}
 	}, cacheDuration);
 }
 
-function AuthClient({ graphUrl, cacheDuration }) {
-	privateMap[this] = new AuthClientPrivate({ graphUrl, cacheDuration });
-}
-
 Object.defineProperty(AuthClient.prototype, "cacheLength", {
 	get : function() {
-		return Object.keys(privateMap[this].cache).length;
+		return Object.keys(this._cache).length;
 	}
 });
 
 AuthClient.prototype.close = function() {
-	clearInterval(privateMap[this].interval);
+	clearInterval(this._interval);
 }
 
 AuthClient.prototype.clearCache = function() {
-	privateMap[this].cache = {};
+	this._cache = {};
 }
 
 AuthClient.prototype.getUser = async function({ acct_id, token }) {
-	const { cache, graphServer } = privateMap[this];
-	
 	const cacheKey = `${token}_${acct_id}`;
-	const cacheEntry = cache[cacheKey];
+	const cacheEntry = this._cache[cacheKey];
 	if (cacheEntry !== undefined) {
-		const cacheResult = await graphServer.auth.check_token_cache({
+		const cacheResult = await this._graphServer.auth.check_token_cache({
 			date : new Date(cacheEntry.created).toISOString(),
 			acct_id,
 			fields : `success message`,
@@ -53,7 +46,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 		}
 	}
 	
-	const userResult = await graphServer.auth.current({
+	const userResult = await this._graphServer.auth.current({
 		acct_id,
 		fields : `
 			success
@@ -82,7 +75,7 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 	
 	const user = new User(userResult.doc);
 	
-	cache[cacheKey] = {
+	this._cache[cacheKey] = {
 		user,
 		created : Date.now()
 	}

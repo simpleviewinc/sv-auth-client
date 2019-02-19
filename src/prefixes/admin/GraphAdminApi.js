@@ -1,15 +1,15 @@
-const { query, nullToUndefined } = require("./utils.js");
+const { query, nullToUndefined } = require("../../utils.js");
 
 class GraphAdminApi {
-	constructor({ graphUrl, name, context }) {
-		this.graphUrl = graphUrl;
-		this.name = name;
-		this.context = context;
+	constructor({ graphUrl, name, graphServer }) {
+		this._graphUrl = graphUrl;
+		this._name = name;
+		this._graphServer = graphServer;
 	}
 	async find({ filter, options, fields, context }) {
-		const method = this.name;
+		const method = this._name;
 		
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const variables = {
 			filter,
@@ -28,20 +28,20 @@ class GraphAdminApi {
 				}
 			`,
 			variables,
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		
-		const returnData = response.admin[this.name];
+		const returnData = response.admin[this._name];
 		
 		nullToUndefined(returnData)
 		
 		return returnData;
 	}
 	async upsert({ input, fields, context }) {
-		const method = `${this.name}_upsert`;
+		const method = `${this._name}_upsert`;
 		
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const variables = {
 			input,
@@ -59,7 +59,7 @@ class GraphAdminApi {
 				}
 			`,
 			variables,
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		
@@ -70,9 +70,9 @@ class GraphAdminApi {
 		return returnData;
 	}
 	async remove({ filter, fields, context }) {
-		const method = `${this.name}_remove`;
+		const method = `${this._name}_remove`;
 		
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const variables = {
 			filter,
@@ -90,7 +90,7 @@ class GraphAdminApi {
 				}
 			`,
 			variables,
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		

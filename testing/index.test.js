@@ -5,14 +5,14 @@ const mochaLib = require("@simpleview/mochalib");
 
 const GRAPH_URL = "https://graphql.kube.simpleview.io/";
 
-const graphServer = new GraphServer({ graphUrl : GRAPH_URL });
+const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : ["admin", "auth"] });
 const authClient = new AuthClient({ graphUrl : GRAPH_URL });
 
 describe(__filename, function() {
 	let login1;
 	
 	before(async function() {
-		await graphServer.test.reset_data();
+		await graphServer.auth.reset_data();
 		login1 = await graphServer.auth.login({
 			email : "test0@test.com",
 			password : "test",
@@ -85,7 +85,7 @@ describe(__filename, function() {
 		
 		assert.strictEqual(user, user2);
 		
-		const upsertResult = await graphServer.users.upsert({
+		const upsertResult = await graphServer.admin.users_upsert({
 			input : {
 				id : user.id,
 				firstname : "Changed",

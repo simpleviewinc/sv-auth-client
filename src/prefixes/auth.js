@@ -1,12 +1,28 @@
-const { query } = require("../utils.js");
+const Accounts = require("./auth/accounts");
+const { query } = require("../utils");
 
-class Auth {
-	constructor({ graphUrl, name, context }) {
-		this.graphUrl = graphUrl;
-		this.context = context;
+class AuthPrefix {
+	constructor({ graphUrl, graphServer }) {
+		this._graphUrl = graphUrl;
+		this._graphServer = graphServer;
+		
+		this._accounts = new Accounts({
+			graphUrl,
+			name : "accounts",
+			graphServer
+		});
+	}
+	async accounts(...args) {
+		return this._accounts.find(...args);
+	}
+	async accounts_upsert(...args) {
+		return this._accounts.upsert(...args);
+	}
+	async accounts_remove(...args) {
+		return this._accounts.remove(...args);
 	}
 	async current({ acct_id, fields, context }) {
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const result = await query({
 			query : `
@@ -21,7 +37,7 @@ class Auth {
 			variables : {
 				acct_id
 			},
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		
@@ -42,7 +58,7 @@ class Auth {
 				token,
 				new_pass
 			},
-			url : this.graphUrl
+			url : this._graphUrl
 		});
 		
 		return result.auth.update_password;
@@ -63,7 +79,7 @@ class Auth {
 				email,
 				password
 			},
-			url : this.graphUrl
+			url : this._graphUrl
 		});
 		
 		return result.auth.login;
@@ -82,13 +98,13 @@ class Auth {
 			variables : {
 				token
 			},
-			url : this.graphUrl
+			url : this._graphUrl
 		});
 		
 		return result.auth.login_google;
 	}
 	async check_token_cache({ date, acct_id, fields, context }) {
-		context = context || this.context;
+		context = context || this._graphServer.context;
 		
 		const result = await query({
 			query : `
@@ -104,12 +120,28 @@ class Auth {
 				date,
 				acct_id
 			},
-			url : this.graphUrl,
+			url : this._graphUrl,
 			token : context.token
 		});
 		
 		return result.auth.check_token_cache;
 	}
+	async reset_data() {
+		const rtn = await query({
+			query : `
+				mutation {
+					auth {
+						test_reset_data {
+							success
+						}
+					}
+				}
+			`,
+			url : this._graphUrl
+		});
+		
+		return rtn.auth.test_reset_data;
+	}
 }
 
-module.exports = Auth;
+module.exports = AuthPrefix;

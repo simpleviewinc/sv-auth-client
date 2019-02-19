@@ -15,8 +15,6 @@ async function query({ query, variables, url, token }) {
 			}
 		});
 	} catch(e) {
-		console.log("e", e);
-		console.log(e.response.data.errors);
 		throw e;
 	}
 	
