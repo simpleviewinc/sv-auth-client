@@ -45,6 +45,26 @@ class AuthPrefix {
 		
 		return result.auth.current;
 	}
+	async reset_password_start({ email, redirectUrl, fields }) {
+		const result = await query({
+			query : `
+				mutation($email: String!, $redirectUrl: String!) {
+					auth {
+						reset_password_start(email: $email, redirectUrl: $redirectUrl) {
+							${fields}
+						}
+					}
+				}
+			`,
+			variables : {
+				email,
+				redirectUrl
+			},
+			url : this._graphUrl
+		});
+		
+		return result.auth.reset_password_start;
+	}
 	async update_password({ token, new_pass, fields }) {
 		const result = await query({
 			query : `
