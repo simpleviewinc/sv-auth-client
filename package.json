@@ -1,24 +1,24 @@
 {
-	"name" : "@simpleview/sv-auth-client",
-	"version" : "1.0.2",
-	"description" : "Client for communicating with sv-auth",
-	"author" : "Owen Allen <owenallenaz@gmail.com>",
-	"devDependencies" : {
-		"@simpleview/mochalib" : "1.0.1",
-		"mocha" : "5.2.0"
+	"name": "@simpleview/sv-auth-client",
+	"version": "1.0.3",
+	"description": "Client for communicating with sv-auth",
+	"author": "Owen Allen <owenallenaz@gmail.com>",
+	"devDependencies": {
+		"@simpleview/mochalib": "1.0.1",
+		"mocha": "5.2.0"
 	},
-	"dependencies" : {
-		"@simpleview/sv-graphql-client" : "1.0.0",
-		"axios" : "0.18.0"
+	"dependencies": {
+		"@simpleview/sv-graphql-client": "1.0.0",
+		"axios": "0.18.0"
 	},
-	"main" : "src/index.js",
-	"scripts" : {
-		"test" : "mocha testing",
-		"docker" : "./docker/build && ./docker/run || true"
+	"main": "src/index.js",
+	"scripts": {
+		"test": "mocha testing",
+		"docker": "./docker/build && ./docker/run || true"
 	},
-	"repository" : {
-		"type" : "git",
-		"url" : "https://github.com/simpleviewinc/sv-auth-client"
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/simpleviewinc/sv-auth-client"
 	},
-	"license" : "MIT"
+	"license": "MIT"
 }
