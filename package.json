@@ -1,6 +1,6 @@
 {
 	"name": "@simpleview/sv-auth-client",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Client for communicating with sv-auth",
 	"author": "Owen Allen <owenallenaz@gmail.com>",
 	"devDependencies": {
