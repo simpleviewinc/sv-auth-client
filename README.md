@@ -143,3 +143,9 @@ const allow = user.can(["cms.something.another", "cms.another.permission"]);
 ### User.toPlain
 
 Convert the `User` object back to a plain JS object.
+
+# Development
+
+* Enter dev environment - `sudo npm run docker`
+* Test - `npm test`
+* Publish - `sudo npm run publish -- SEMVER`
