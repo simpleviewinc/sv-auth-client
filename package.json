@@ -14,7 +14,8 @@
 	"main": "src/index.js",
 	"scripts": {
 		"test": "mocha testing",
-		"docker": "./docker/build && ./docker/run || true"
+		"docker": "./docker/build && ./docker/run || true",
+		"publish" : "npm version $VERSION && npm publish --access public"
 	},
 	"repository": {
 		"type": "git",
