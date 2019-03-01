@@ -15,7 +15,7 @@
 	"scripts": {
 		"test": "mocha testing",
 		"docker": "./docker/build && ./docker/run || true",
-		"publish": "npm version $1 && npm publish --access public"
+		"publish": "./publish"
 	},
 	"repository": {
 		"type": "git",
