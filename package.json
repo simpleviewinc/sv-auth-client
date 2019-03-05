@@ -4,7 +4,7 @@
 	"description": "Client for communicating with sv-auth",
 	"author": "Owen Allen <owenallenaz@gmail.com>",
 	"peerDependencies" : {
-		"@simpleview/sv-graphql-client": "*",
+		"@simpleview/sv-graphql-client": "*"
 	},
 	"devDependencies": {
 		"@simpleview/sv-graphql-client": "1.0.1",
