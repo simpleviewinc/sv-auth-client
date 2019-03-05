@@ -1,9 +1,9 @@
 {
 	"name": "@simpleview/sv-auth-client",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Client for communicating with sv-auth",
 	"author": "Owen Allen <owenallenaz@gmail.com>",
-	"peerDependencies" : {
+	"peerDependencies": {
 		"@simpleview/sv-graphql-client": "*"
 	},
 	"devDependencies": {
