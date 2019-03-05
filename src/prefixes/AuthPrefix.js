@@ -1,5 +1,5 @@
 const Accounts = require("./auth/Accounts");
-const { query } = require("@simpleview/sv-graphql-client");
+const { query, nullToUndefined } = require("@simpleview/sv-graphql-client");
 
 class AuthPrefix {
 	constructor({ graphUrl, graphServer }) {
@@ -43,7 +43,11 @@ class AuthPrefix {
 			token : context.token
 		});
 		
-		return result.auth.current;
+		const returnData = result.auth.current;
+		
+		nullToUndefined(returnData)
+		
+		return returnData;
 	}
 	async update_password({ token, new_pass, fields }) {
 		const result = await query({
