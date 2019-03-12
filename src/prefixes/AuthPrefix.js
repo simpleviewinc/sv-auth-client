@@ -23,6 +23,27 @@ class AuthPrefix {
 	async accounts_remove(...args) {
 		return this._accounts.remove(...args);
 	}
+	async account_public({ acct_id, fields, context }) {
+		context = context || this._graphServer.context;
+		
+		const result = await query({
+			query : `
+				query($acct_id: String!) {
+					auth {
+						account_public(acct_id: $acct_id) {
+							${fields}
+						}
+					}
+				}
+			`,
+			variables : {
+				acct_id
+			},
+			url : this._graphUrl
+		});
+		
+		return result.auth.account_public;
+	}
 	async current({ acct_id, fields, context }) {
 		context = context || this._graphServer.context;
 		
