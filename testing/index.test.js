@@ -1,5 +1,5 @@
 const { query, GraphServer } = require("@simpleview/sv-graphql-client");
-const { AuthClient, User, AdminPrefix, AuthPrefix } = require("../");
+const { AuthClient, User, AdminPrefix, AuthPrefix, isCommonPassword } = require("../");
 const assert = require("assert");
 const mochaLib = require("@simpleview/mochalib");
 
@@ -117,6 +117,18 @@ describe(__filename, function() {
 		});
 		
 		assert.strictEqual(user, undefined);
+	});
+
+	it("should pass common password check", async function() {
+		const password = await isCommonPassword("Password1@");
+		
+		assert.strictEqual(password, false);
+	});
+
+	it("should fail common password check", async function() {
+		const password = await isCommonPassword("Password1");
+		
+		assert.strictEqual(password, true);
 	});
 	
 	describe("User.can", function() {
