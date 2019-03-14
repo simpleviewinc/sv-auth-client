@@ -18,13 +18,10 @@ async function isCommonPassword(val){
 	const commomPasswords = ["Password1", "password", "123456789", "12345678", "sunshine", "iloveyou", "princess", "football", "!@#$%^&*", "aa123456",  "password1", "qwerty123"]
 
 	if ( commomPasswords.includes(val) === true ) {		
-		return {
-			success : false,
-			message : "This is a very common password. Choose something that will be harder for others to guess."
-		}
+		return true;
 	}
 
-	return { success : true }
+	return false;
 }
 
 module.exports = {

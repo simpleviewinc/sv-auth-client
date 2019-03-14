@@ -122,18 +122,13 @@ describe(__filename, function() {
 	it("should pass common password check", async function() {
 		const password = await isCommonPassword("Password1@");
 		
-		assert.notStrictEqual(password, { 
-			success: true
-		});
+		assert.strictEqual(password, false);
 	});
 
 	it("should fail common password check", async function() {
 		const password = await isCommonPassword("Password1");
 		
-		assert.notStrictEqual(password, { 
-			success: false,
-			message: 'This is a very common password. Choose something that will be harder for others to guess.'
-		});
+		assert.strictEqual(password, true);
 	});
 	
 	describe("User.can", function() {
