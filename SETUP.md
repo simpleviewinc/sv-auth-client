@@ -1,8 +1,8 @@
 # Integrating with SV-Auth
 
 Ensure the following package dependencies are installed in your containers that need to communicate with auth.
-	- `@simpleview/sv-auth-client`
-	- `@simpleview/sv-graphql-client`
+- `@simpleview/sv-auth-client`
+- `@simpleview/sv-graphql-client`
 
 ## Registering a Permissions for a Product on an Account
 
