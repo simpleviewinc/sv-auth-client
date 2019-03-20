@@ -2,46 +2,21 @@
 
 Client for communicating with sv-auth. This npm package contains classes and helpers for communicating with the sv-auth graphQL system.
 
-There are 2 primary use-cases for `sv-auth-client`. One is in converting a `token` from GraphQL into a `User` so you can verify permission, the other is when wanting to access the `auth` or `admin` graphQL prefixes. For the `token` conversion, utilize `AuthClient` class. For the graphQL library utilize the `AuthPrefix` and `AdminPrefix`. See SETUP.md for instructions on integrating your repo with sv-auth-client.
+Use cases include:
+* Registering permissions on the auth system for your product.
+* Working with tokens from the auth system.
+* Wrapping the UI of your product behind the auth system.
+* Converting a token into a user and checking their permissions.
 
-# Installation
+## Installation
 
 ```
 npm install @simpleview/sv-auth-client
 ```
 
-## Usage in GraphQL Server-side
+## Setup
 
-For your GraphQL endpoint, if you require authentication, which you should, you will need to extract the token from the server headers passed from `sv-graphql`.
-
-Add the token from the header into your context.
-```js
-const { getTokenFromHeaders } = require("@simpleview/sv-auth-client");
-const server = new ApolloServer({
-	...
-	context: ({ req }) => {
-		return {
-			...
-			token : getTokenFromHeaders(req.headers)
-		};
-	}
-});
-```
-
-Next once the token is extracted, you will need to convert that token into a user. In order to convert a token into a user you will need the `token` and an `acct_id`. How you do this depends on the semantics of your GraphQL routes.
-
-```js
-const { AuthClient } = require("@simpleview/sv-auth-client");
-const authClient = new AuthClient({ graphUrl : GRAPH_URL });
-
-... in a resolver
-const user = await authClient.getUser({
-	token : "X",
-	acct_id : "Y"
-});
-```
-
-An example of this is in the `sv-auth` repo in it's [GraphQL admin Query and Mutation resolvers](https://github.com/simpleviewinc/sv-auth/blob/master/containers/graphql/lib/graphql/root_admin.js). In utilizes `processToken` for both Mutation and Query to verify the token is passed. In that case, it has a filter argument of acct_id in order to recurse deeper into the GraphQL tree. In your case, you will need a real graphUrl, this only uses a localhost URL because it is the auth system querying itself.
+For integrating your project with auth, please see the [Setup Instructions](SETUP.md).
 
 # Package API
 
