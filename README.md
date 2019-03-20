@@ -152,8 +152,8 @@ This section is provided to provide additional information about the GraphQL end
 ## auth_query
 - **accounts**
 	- Returns an array of accounts containing associated users and roles.
-	- Filter will automatically include `acct_id` if user is not an SV employee.
-	- Can either filter on acct_id or the internal stringified mongo ObjectId.
+	- If the user is not an SV employee, they will only receive the accounts they have access to. If they are an SV employee they will receive all accounts.
+	- See schema browser for filters/options.
 	- Bearer token must be provided in Authorization header.
 	```
 	query {
@@ -170,8 +170,8 @@ This section is provided to provide additional information about the GraphQL end
 	```
 
 - **current**
-	- Validates the provided token and returns the associated user object.
-	- Returns a token invalid message if returned user is null.
+	- Retrieve the current user and their permissions for the specified account.
+	- Returns a token invalid message if returned user is not valid for that account or the token is invalid.
 	- This does not refresh the token.
 	- Bearer token must be provided in Authorization header.
 	```
@@ -190,9 +190,9 @@ This section is provided to provide additional information about the GraphQL end
 	```
 
 - **check_token_cache**
+	- Internal method used for validating caches. Should not be used in normal integrations.
 	- Validates the provided token and checks the cache to verify it is stale and needs to be revalidated.
-	- Returns a token invalid message if returned user is null.
-	- Returns a cache invalid message if the cache has expired.
+	- Success is true if the user exists and the cache entry is valid.
 	- This does not refresh the token.
 	- Bearer token must be provided in Authorization header.
 	```
@@ -219,10 +219,8 @@ This section is provided to provide additional information about the GraphQL end
 	```
 
 - **login_google**
-	- Provided a Google token, logs a user in by returning an Auth token.
-	- The input Google token is separate and not compatible with the Auth token.
+	- Converts a Google OAuth token into an auth token.
 	- Returns an invalid credentials error if login fails.
-	- This endpoint should never be manually called.
 
 ## auth_mutation
 - **accounts_upsert**
@@ -260,8 +258,8 @@ This section is provided to provide additional information about the GraphQL end
 
 - **update_password**
 	- Updates a user's password.
-	- Requires the password be at least 8 characters long and is not common.
-	- All passwords are salted, hashed, and irretrievable without original string.
+	- Requires a password reset token and a new password that is 8 characters or longer and doesn't not match a too-simple password DB.
+	- Passwords are stored salted, hashed, and are irretrievable.
 	```
 	mutation {
 		auth {
@@ -276,7 +274,7 @@ This section is provided to provide additional information about the GraphQL end
 ## admin_query
 - **products**
 	- Returns all products and possible permissions for that product, for an account.
-	- Filter will automatically include `acct_id` of the user.
+	- See schema browser for filters/options.
 	```
 	query {
 		admin(acct_id : "0") {
@@ -292,7 +290,7 @@ This section is provided to provide additional information about the GraphQL end
 
 - **roles**
 	- Returns all roles for an account.
-	- Filter will automatically include `acct_id` of the user.
+	- See schema browser for filters/options.
 	```
 	query {
 		admin(acct_id : "0") {
@@ -310,7 +308,7 @@ This section is provided to provide additional information about the GraphQL end
 
 - **users**
 	- Returns all users on an account.
-	- Filter will automatically include `acct_id` of the user.
+	- See schema browser for filters/options.
 	```
 	query {
 		admin(acct_id : "0") {
@@ -371,7 +369,6 @@ This section is provided to provide additional information about the GraphQL end
 
 - **roles_remove**
 	- Deletes roles from the system.
-	- Filter will automatically include `acct_id` of the user.
 	- Take care not to call this endpoint without any filters as this will hard delete all roles on the account.
 	```
 	mutation {
@@ -385,8 +382,8 @@ This section is provided to provide additional information about the GraphQL end
 	```
 
 - **users_upsert**
-	- Provided an `email` and user data, updates the associated user or inserts one if it does not exist. 
-	- This endpoint will send an invitational email to the provided email address. 
+	- Provided an `email` and user data, updates the associated user or inserts one if it does not exist.
+	- This endpoint will send an invitational email to the provided email address.
 	```
 	mutation {
 		admin(acct_id : "0") {
@@ -403,7 +400,6 @@ This section is provided to provide additional information about the GraphQL end
 
 - **users_remove**
 	- Deletes users from the system.
-	- Filter will automatically include `acct_id` of the user.
 	- Take care not to call this endpoint without any filters as this will hard delete all users on the account.
 	```
 	mutation {
@@ -423,4 +419,4 @@ This section is provided to provide additional information about the GraphQL end
 
 * Enter dev environment - `sudo npm run docker`
 * Test - `npm test`
-* Publish - `sudo npm run publish -- SEMVER`
+* Publish - `sudo npm run publish SEMVER`
