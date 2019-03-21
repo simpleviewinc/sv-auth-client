@@ -132,7 +132,7 @@ This section is provided to provide additional information about the GraphQL end
 	- Bearer token must be provided in Authorization header.
 	```
 	query {
-		admin {
+		auth {
 			accounts {
 				count
 				docs {
@@ -144,6 +144,25 @@ This section is provided to provide additional information about the GraphQL end
 	}
 	```
 
+- **accounts_public**
+	- Returns a single account, able to be filtered by 'name' or 'acct_id'.
+	- Does not require a token, publically accessible.
+	```
+	query {
+		auth {
+			accounts_public(filter: { name : 'test' }) {
+				success
+				message
+				doc {
+					acct_id
+					name
+					label
+				}
+			}
+		}
+	}
+	```
+	
 - **current**
 	- Retrieve the current user and their permissions for the specified account.
 	- Returns a token invalid message if returned user is not valid for that account or the token is invalid.
@@ -171,10 +190,12 @@ This section is provided to provide additional information about the GraphQL end
 	- This does not refresh the token.
 	- Bearer token must be provided in Authorization header.
 	```
-	auth {
-		check_token_cache(date : "2019-03-15T23:51:17.019Z", acct_id : "0") {
-			success
-			message
+	query {
+		auth {
+			check_token_cache(date : "2019-03-15T23:51:17.019Z", acct_id : "0") {
+				success
+				message
+			}
 		}
 	}
 	```

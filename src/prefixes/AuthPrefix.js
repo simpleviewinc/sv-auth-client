@@ -42,7 +42,11 @@ class AuthPrefix {
 			url : this._graphUrl
 		});
 		
-		return result.auth.account_public;
+		const returnData = result.auth.account_public;
+		
+		nullToUndefined(returnData)
+		
+		return returnData;
 	}
 	async current({ acct_id, fields, context }) {
 		context = context || this._graphServer.context;
