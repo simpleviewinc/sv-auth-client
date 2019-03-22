@@ -144,13 +144,13 @@ This section is provided to provide additional information about the GraphQL end
 	}
 	```
 
-- **accounts_public**
+- **account_public**
 	- Returns a single account, able to be filtered by 'name' or 'acct_id'.
 	- Does not require a token, publically accessible.
 	```
 	query {
 		auth {
-			accounts_public(filter: { name : 'test' }) {
+			account_public(filter: { name : 'test' }) {
 				success
 				message
 				doc {
