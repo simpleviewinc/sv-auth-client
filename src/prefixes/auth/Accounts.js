@@ -56,7 +56,10 @@ class Accounts {
 			token : context.token
 		});
 		
-		return response.auth.accounts_upsert;
+		const returnData = response.auth.accounts_upsert;
+		nullToUndefined(returnData)
+		
+		return returnData;
 	}
 	async remove({ filter, fields, context }) {
 		throw new Error("BROKEN NOT IMPLEMENTED!");
