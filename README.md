@@ -2,46 +2,21 @@
 
 Client for communicating with sv-auth. This npm package contains classes and helpers for communicating with the sv-auth graphQL system.
 
-There are 2 primary use-cases for `sv-auth-client`. One is in converting a `token` from GraphQL into a `User` so you can verify permission, the other is when wanting to access the `auth` or `admin` graphQL prefixes. For the `token` conversion, utilize `AuthClient` class. For the graphQL library utilize the `AuthPrefix` and `AdminPrefix`.
+Use cases include:
+* Registering permissions on the auth system for your product.
+* Working with tokens from the auth system.
+* Wrapping the UI of your product behind the auth system.
+* Converting a token into a user and checking their permissions.
 
-# Installation
+## Installation
 
 ```
 npm install @simpleview/sv-auth-client
 ```
 
-## Usage in GraphQL Server-side
+## Setup
 
-For your GraphQL endpoint, if you require authentication, which you should, you will need to extract the token from the server headers passed from `sv-graphql`.
-
-Add the token from the header into your context.
-```js
-const { getTokenFromHeaders } = require("@simpleview/sv-auth-client");
-const server = new ApolloServer({
-	...
-	context: ({ req }) => {
-		return {
-			...
-			token : getTokenFromHeaders(req.headers)
-		};
-	}
-});
-```
-
-Next once the token is extracted, you will need to convert that token into a user. In order to convert a token into a user you will need the `token` and an `acct_id`. How you do this depends on the semantics of your GraphQL routes.
-
-```js
-const { AuthClient } = require("@simpleview/sv-auth-client");
-const authClient = new AuthClient({ graphUrl : GRAPH_URL });
-
-... in a resolver
-const user = await authClient.getUser({
-	token : "X",
-	acct_id : "Y"
-});
-```
-
-An example of this is in the `sv-auth` repo in it's [GraphQL admin Query and Mutation resolvers](https://github.com/simpleviewinc/sv-auth/blob/master/containers/graphql/lib/graphql/root_admin.js). In utilizes `processToken` for both Mutation and Query to verify the token is passed. In that case, it has a filter argument of acct_id in order to recurse deeper into the GraphQL tree. In your case, you will need a real graphUrl, this only uses a localhost URL because it is the auth system querying itself.
+For integrating your project with auth, please see the [Setup Instructions](SETUP.md).
 
 # Package API
 
@@ -144,8 +119,300 @@ const allow = user.can(["cms.something.another", "cms.another.permission"]);
 
 Convert the `User` object back to a plain JS object.
 
+# GraphQL Endpoints
+
+This section is provided to provide additional information about the GraphQL endpoints. To see the input parameters and output of each endpoint, please view the Schema in the GraphQL Explorer at https://graphql.simpleviewinc.com/.
+
+
+## auth_query
+- **accounts**
+	- Returns an array of accounts containing associated users and roles.
+	- If the user is not an SV employee, they will only receive the accounts they have access to. If they are an SV employee they will receive all accounts.
+	- See schema browser for filters/options.
+	- Bearer token must be provided in Authorization header.
+	```
+	query {
+		auth {
+			accounts {
+				count
+				docs {
+					name
+					active
+				}
+			}
+		}
+	}
+	```
+
+- **account_public**
+	- Returns a single account, able to be filtered by 'name' or 'acct_id'.
+	- Does not require a token, publically accessible.
+	```
+	query {
+		auth {
+			account_public(filter: { name : 'test' }) {
+				success
+				message
+				doc {
+					acct_id
+					name
+					label
+				}
+			}
+		}
+	}
+	```
+	
+- **current**
+	- Retrieve the current user and their permissions for the specified account.
+	- Returns a token invalid message if returned user is not valid for that account or the token is invalid.
+	- This does not refresh the token.
+	- Bearer token must be provided in Authorization header.
+	```
+	query {
+		auth {
+			current(acct_id : "0") {
+				success
+				message
+				doc {
+					firstname
+					lastname
+				}
+			}
+		}
+	}
+	```
+
+- **check_token_cache**
+	- Internal method used for validating caches. Should not be used in normal integrations.
+	- Validates the provided token and checks the cache to verify it is stale and needs to be revalidated.
+	- Success is true if the user exists and the cache entry is valid.
+	- This does not refresh the token.
+	- Bearer token must be provided in Authorization header.
+	```
+	query {
+		auth {
+			check_token_cache(date : "2019-03-15T23:51:17.019Z", acct_id : "0") {
+				success
+				message
+			}
+		}
+	}
+	```
+
+- **login**
+	- Provided an email and password, logs a user in by returning a token.
+	- Returns an invalid credentials error if login fails.
+	```
+	query {
+		auth {
+			login(email: "test0@test.com", password : "test"){
+				token
+				message
+			}
+		}
+	}
+	```
+
+- **login_google**
+	- Converts a Google OAuth token into an auth token.
+	- Returns an invalid credentials error if login fails.
+
+## auth_mutation
+- **accounts_upsert**
+	- Provided an `acct_id` and account data, updates the associated account or inserts one if it does not exist.
+	- This endpoint is restricted to SV employees only.
+	- Bearer token must be provided in Authorization header.
+	```
+	mutation {
+		auth {
+			accounts_upsert(input : { acct_id : "999", name : "Test Account", active : true }) {
+				success
+				message
+				doc {
+					id
+				}
+			}
+		}
+	}
+	```
+
+- **reset_password_start**
+	- Starts the process for reseting a user's password by sending an password reset email to the user.
+	- Sent email contains a reset link that expires after 24 hours.
+	- Returns a the resulting error if password reset email fails to send. See [sv-email-client](https://github.com/simpleviewinc/sv-email-client) for more info on email errors.
+	```
+	mutation {
+		auth {
+			reset_password_start(email : "test0@test.com", redirectUrl : "http://google.com") {
+				success
+				message
+			}
+		}
+	}
+	```
+
+- **update_password**
+	- Updates a user's password.
+	- Requires a password reset token and a new password that is 8 characters or longer and doesn't not match a too-simple password DB.
+	- Passwords are stored salted, hashed, and are irretrievable.
+	```
+	mutation {
+		auth {
+			update_password(token : "XXXXXXXXXX", new_pass : "secure_password") {
+				success
+				message
+			}
+		}
+	}
+	```
+
+## admin_query
+- **products**
+	- Returns all products and possible permissions for that product, for an account.
+	- See schema browser for filters/options.
+	```
+	query {
+		admin(acct_id : "0") {
+			products {
+				count
+				docs {
+					name
+				}
+			}
+		}
+	}
+	```
+
+- **roles**
+	- Returns all roles for an account.
+	- See schema browser for filters/options.
+	```
+	query {
+		admin(acct_id : "0") {
+			roles {
+				count
+				docs {
+					name
+					description
+				}
+			}
+		}
+	}
+	```
+
+
+- **users**
+	- Returns all users on an account.
+	- See schema browser for filters/options.
+	```
+	query {
+		admin(acct_id : "0") {
+			users {
+				count
+				docs {
+					firstname
+					lastname
+				}
+			}
+		}
+	}
+	```
+
+## admin_mutation
+- **products_upsert**
+	- Provided an `acct_id` and product data, updates the associated product or inserts one if it does not exist.
+	- This endpoint is used to define all possible permissions associated with a product belonging to an account. This is to say that possible permissions can vary from account to account for the same product.
+	- This call should be made anytime the possible permissions for an account's product have changed.
+	```
+	mutation {
+		admin(acct_id : "0") {
+			products_upsert(input: { name : "prd", label : "Product", permissions : [
+				{ name : "perm", label : "Permission Group" },
+				{ name : "perm.read", label : "Permission - Read", description : "This is a read permission", permType : "read" },
+				{ name : "perm.write", label : "Permission - Write", description : "This is a write permission", permType : "write" },
+				{ name : "perm.remove", label : "Permission - Remove", description : "This is a remove permission", permType : "remove" },
+			]}){
+				success
+				message
+			}
+		}
+	}
+	```
+
+- **roles_upsert**
+	- Provided an `id`, updates the associated role or inserts one if it does not exist.
+	```
+	mutation {
+		admin(acct_id : "0") {
+			roles_upsert(input : { name : "Nav Admin",  description : "Like a boss", permissions : [
+				"cms.nav.primary.read",
+				"cms.nav.primary.write",
+				"cms.nav.primary.remove",
+				"cms.nav.secondary.read",
+				"cms.nav.secondary.write",
+				"cms.nav.secondary.remove"
+			]}) {
+				success
+				message
+				doc {
+					id
+				}
+			}
+		}
+	}
+	```
+
+- **roles_remove**
+	- Deletes roles from the system.
+	- Take care not to call this endpoint without any filters as this will hard delete all roles on the account.
+	```
+	mutation {
+		admin(acct_id : "0") {
+			roles_remove(filter : { id : "5c8c3725df622c0064491fc9" }) {
+				success
+				message
+			}
+		}
+	}
+	```
+
+- **users_upsert**
+	- Provided an `email` and user data, updates the associated user or inserts one if it does not exist.
+	- This endpoint will send an invitational email to the provided email address.
+	```
+	mutation {
+		admin(acct_id : "0") {
+			users_upsert(input : { email : "test@test.com", firstname : "Test", lastname : "User", active : true }) {
+				success
+				message
+				doc {
+					id
+				}
+			}
+		}
+	}
+	```
+
+- **users_remove**
+	- Deletes users from the system.
+	- Take care not to call this endpoint without any filters as this will hard delete all users on the account.
+	```
+	mutation {
+		admin(acct_id : "0") {
+			users_remove(filter : { id : "5c8c37b5df622c0064491fca" }) {
+				success
+				message
+			}
+		}
+	}
+	```
+
+
+
+
 # Development
 
 * Enter dev environment - `sudo npm run docker`
 * Test - `npm test`
-* Publish - `sudo npm run publish -- SEMVER`
+* Publish - `sudo npm run publish SEMVER`
