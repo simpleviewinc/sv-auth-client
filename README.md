@@ -324,14 +324,28 @@ This section is provided to provide additional information about the GraphQL end
 	- Provided an `acct_id` and product data, updates the associated product or inserts one if it does not exist.
 	- This endpoint is used to define all possible permissions associated with a product belonging to an account. This is to say that possible permissions can vary from account to account for the same product.
 	- This call should be made anytime the possible permissions for an account's product have changed.
+	- This call can only be made by an `sv` user.
+	- The permission object has a strict structure that must be followed.
+		- Each permission starts with the product name and then drills down through `branch` permissions until it reaches a `leaf` permission.
+		- If you have a permission called `product1.group1.group2.perm1` then `product1` must be the exact `name` of the product. `product1.group1`, `product1.group1.group2` and `product1.group1.group2.perm1` must all have their own entries in the array.
+		- In the above example the permission `product1.group1` and `product1.group1.group2` are `branch` permissions. They must have a label and CANNOT have a permType. These branch permissions are used solely for organization and assisting the user in understanding your permission structure.
+		- In the above example the permission `product1.group1.group2.perm1` is a `leaf` permission and must have a `permType`.
+		- The order of the permissions in the array does not matter, but keeping them in a logical order in your code is preferable for your own sanity.
+		- The product name must be all lowercase letters, numbers and dashes.
+		- The permission name must be all lowercase letters, numbers and dashes separated by periods.
+		- For each permission the permType must be `write`, `read`, or `remove`.
+		- Description is optional. If specified the `leaf` or `branch` permission will received a tooltip in the UI to assist the user in understanding the permission or group.
 	```
 	mutation {
 		admin(acct_id : "0") {
-			products_upsert(input: { name : "prd", label : "Product", permissions : [
-				{ name : "perm", label : "Permission Group" },
-				{ name : "perm.read", label : "Permission - Read", description : "This is a read permission", permType : "read" },
-				{ name : "perm.write", label : "Permission - Write", description : "This is a write permission", permType : "write" },
-				{ name : "perm.remove", label : "Permission - Remove", description : "This is a remove permission", permType : "remove" },
+			products_upsert(input: { name : "my_product", label : "Product", permissions : [
+				{ name : "prd.perm", label : "Permission Group" },
+				{ name : "prd.perm.read", label : "Permission - Read", description : "This is a read permission", permType : "read" },
+				{ name : "prd.perm.write", label : "Permission - Write", description : "This is a write permission", permType : "write" },
+				{ name : "prd.perm.remove", label : "Permission - Remove", description : "This is a remove permission", permType : "remove" },
+				{ name : "prd.group", label : "Another Group" },
+				{ name : "prd.group.nested", label : "A group on a group" },
+				{ name : "prd.group.nested.read", label : "Nested read permission", description : "Grants the user read on X", permType : "read" }
 			]}){
 				success
 				message
