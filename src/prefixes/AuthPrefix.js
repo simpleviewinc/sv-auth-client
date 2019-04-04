@@ -23,6 +23,9 @@ class AuthPrefix {
 	async accounts_remove(...args) {
 		return this._accounts.remove(...args);
 	}
+	async accounts_sync(...args) {
+		return this._accounts.sync(...args);
+	}
 	async account_public({ filter, fields, context }) {
 		context = context || this._graphServer.context;
 		
