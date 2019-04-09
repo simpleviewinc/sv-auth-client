@@ -89,7 +89,7 @@ class Accounts {
 			token : context.token
 		});
 	}
-	async sync({ args, fields, context }) {
+	async sync({fields, context }) {
 		context = context || this._graphServer.context;
 
 		const response = await query({
@@ -103,7 +103,8 @@ class Accounts {
 				}
 			`,
 			variables : {},
-			url : this._graphUrl
+			url : this._graphUrl,
+			token : context.token
 		});
 
 		const returnData = response.auth.accounts_sync;
