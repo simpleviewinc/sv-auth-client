@@ -89,29 +89,6 @@ class Accounts {
 			token : context.token
 		});
 	}
-	async sync({fields, context }) {
-		context = context || this._graphServer.context;
-
-		const response = await query({
-			query : `
-				mutation {
-					auth {
-						accounts_sync {
-							${fields}
-						}
-					}
-				}
-			`,
-			variables : {},
-			url : this._graphUrl,
-			token : context.token
-		});
-
-		const returnData = response.auth.accounts_sync;
-		nullToUndefined(returnData)
-
-		return returnData;
-	}
 }
 
 module.exports = Accounts;

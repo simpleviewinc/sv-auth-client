@@ -23,9 +23,6 @@ class AuthPrefix {
 	async accounts_remove(...args) {
 		return this._accounts.remove(...args);
 	}
-	async accounts_sync(...args) {
-		return this._accounts.sync(...args);
-	}
 	async account_public({ filter, fields, context }) {
 		context = context || this._graphServer.context;
 		
@@ -49,6 +46,29 @@ class AuthPrefix {
 		
 		nullToUndefined(returnData)
 		
+		return returnData;
+	}
+	async accounts_sync({ fields, context }) {
+		context = context || this._graphServer.context;
+
+		const result = await query({
+			query : `
+				mutation {
+					auth {
+						accounts_sync {
+							${fields}
+						}
+					}
+				}
+			`,
+			url : this._graphUrl,
+			token : context.token
+		});
+
+		const returnData = result.auth.accounts_sync;
+		
+		nullToUndefined(returnData);
+
 		return returnData;
 	}
 	async current({ acct_id, fields, context }) {
