@@ -1,12 +1,12 @@
 {
 	"name": "@simpleview/sv-auth-client",
-	"version": "1.0.16",
+	"version": "1.0.17",
 	"description": "Client for communicating with sv-auth",
 	"author": "Owen Allen <owenallenaz@gmail.com>",
 	"dependencies": {
 		"@simpleview/sv-graphql-client": "*",
 		"graphql": "14.2.1",
-		"graphql-tools" : "4.0.4"
+		"graphql-tools": "4.0.4"
 	},
 	"devDependencies": {
 		"@simpleview/mochalib": "1.0.1",
