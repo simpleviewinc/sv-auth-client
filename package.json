@@ -1,6 +1,6 @@
 {
 	"name": "@simpleview/sv-auth-client",
-	"version": "1.0.17",
+	"version": "1.0.18",
 	"description": "Client for communicating with sv-auth",
 	"author": "Owen Allen <owenallenaz@gmail.com>",
 	"dependencies": {
@@ -13,7 +13,7 @@
 		"mocha": "5.2.0"
 	},
 	"main": "src/index.js",
-	"brower" : "src/browser.js",
+	"brower": "src/browser.js",
 	"scripts": {
 		"test": "mocha testing",
 		"docker": "./dev/build && ./dev/run || true",
