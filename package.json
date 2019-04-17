@@ -13,7 +13,7 @@
 		"mocha": "5.2.0"
 	},
 	"main": "src/index.js",
-	"brower": "src/browser.js",
+	"browser": "src/browser.js",
 	"scripts": {
 		"test": "mocha testing",
 		"docker": "./dev/build && ./dev/run || true",
