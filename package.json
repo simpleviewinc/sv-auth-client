@@ -5,7 +5,8 @@
 	"author": "Owen Allen <owenallenaz@gmail.com>",
 	"dependencies": {
 		"@simpleview/sv-graphql-client": "*",
-		"graphql": "14.2.1"
+		"graphql": "14.2.1",
+		"graphql-tools" : "4.0.4"
 	},
 	"devDependencies": {
 		"@simpleview/mochalib": "1.0.1",
