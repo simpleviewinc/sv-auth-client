@@ -87,6 +87,21 @@ const { GraphServer } = require("@simpleview/sv-graphql-client");
 const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AuthPrefix] });
 ```
 
+## DirectiveCheckPerm
+
+`DirectiveCheckPerm` can be used to enforce permissions to access a resolver.
+
+In graphql schema.
+```
+directive prefix_checkPerm;
+
+query {
+	someResolver: some_result @prefix_checkPerm(perms: ["perm.name"])
+}
+```
+
+Add `DirectiveCheckPerm` class to your `schemaDirectives` object using the key name `prefix_checkPerm`.
+
 ## User
 
 `User` is is returned by `AuthClient.getUser` but it can also be used without `AuthClient` when you want to convert the return from `auth.current` into a user which you wish to check permissions on.

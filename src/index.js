@@ -1,6 +1,7 @@
 const AuthClient = require("./AuthClient");
 const AuthPrefix = require("./prefixes/AuthPrefix");
 const AdminPrefix = require("./prefixes/AdminPrefix");
+const DirectiveCheckPerm = require("./DirectiveCheckPerm");
 const User = require("./User");
 
 function getTokenFromHeaders(headers) {
@@ -37,6 +38,7 @@ module.exports = {
 	AuthClient,
 	AuthPrefix,
 	AdminPrefix,
+	DirectiveCheckPerm,
 	getTokenFromHeaders,
 	isCommonPassword,
 	User

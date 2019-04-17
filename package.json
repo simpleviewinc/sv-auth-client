@@ -3,11 +3,11 @@
 	"version": "1.0.14",
 	"description": "Client for communicating with sv-auth",
 	"author": "Owen Allen <owenallenaz@gmail.com>",
-	"peerDependencies": {
-		"@simpleview/sv-graphql-client": "*"
+	"dependencies" : {
+		"@simpleview/sv-graphql-client" : "*",
+		"graphql-tools" : "4.0.4"
 	},
 	"devDependencies": {
-		"@simpleview/sv-graphql-client": "1.0.1",
 		"@simpleview/mochalib": "1.0.1",
 		"mocha": "5.2.0"
 	},
