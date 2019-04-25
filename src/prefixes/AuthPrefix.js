@@ -137,6 +137,26 @@ class AuthPrefix {
 		
 		return result.auth.update_password;
 	}
+	async refresh_token({ refresh_token, fields }) {
+		const result = await query({
+			query : `
+				query($refresh_token: String!) {
+					auth {
+						refresh_token(refresh_token: $refresh_token) {
+							${fields}
+						}
+					}
+					
+				}
+			`,
+			variables : {
+				refresh_token
+			},
+			url : this._graphUrl
+		});
+		
+		return result.auth.refresh_token;
+	}
 	async login({ email, password, fields }) {
 		const result = await query({
 			query : `
