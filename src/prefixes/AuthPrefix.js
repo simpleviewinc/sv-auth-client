@@ -1,4 +1,5 @@
 const Accounts = require("./auth/Accounts");
+const TestItems = require("./auth/TestItems");
 const { query, nullToUndefined } = require("@simpleview/sv-graphql-client");
 
 class AuthPrefix {
@@ -13,6 +14,12 @@ class AuthPrefix {
 			name : "accounts",
 			graphServer
 		});
+		
+		this._testItems = new TestItems({
+			graphUrl,
+			name : "test_items",
+			graphServer
+		})
 	}
 	async accounts(...args) {
 		return this._accounts.find(...args);
@@ -215,6 +222,9 @@ class AuthPrefix {
 		});
 		
 		return rtn.auth.test_reset_data;
+	}
+	async test_items(...args) {
+		return this._testItems.find(...args);
 	}
 }
 
