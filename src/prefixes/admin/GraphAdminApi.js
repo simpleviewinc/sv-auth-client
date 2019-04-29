@@ -19,7 +19,7 @@ class GraphAdminApi {
 		
 		const response = await query({
 			query : `
-				query($acct_id: String!, $filter: admin_${method}_filter, $options: auth_options) {
+				query($acct_id: String!, $filter: admin_${method}_filter, $options: admin_${method}_options) {
 					admin(acct_id: $acct_id) {
 						${method}(filter: $filter, options: $options) {
 							${fields}
