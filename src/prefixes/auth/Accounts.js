@@ -15,7 +15,7 @@ class Accounts {
 		
 		const response = await query({
 			query : `
-				query($filter: auth_accounts_filter, $options: auth_options) {
+				query($filter: auth_accounts_filter, $options: auth_accounts_options) {
 					auth {
 						accounts(filter: $filter, options: $options) {
 							${fields}
