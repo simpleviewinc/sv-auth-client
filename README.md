@@ -233,6 +233,10 @@ This section is provided to provide additional information about the GraphQL end
 	- Converts a Google OAuth token into an auth token.
 	- Returns an invalid credentials error if login fails.
 
+- **refresh_token**
+	- Converts a refresh_token received from a login endpoint into a regular token.
+	- The refresh_token is retrieved from a login attempt and can be stored long term in a secure location to exchange for a normal token at anytime.
+
 ## auth_mutation
 - **accounts_upsert**
 	- Provided an `acct_id` and account data, updates the associated account or inserts one if it does not exist.
