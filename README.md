@@ -233,6 +233,10 @@ This section is provided to provide additional information about the GraphQL end
 	- Converts a Google OAuth token into an auth token.
 	- Returns an invalid credentials error if login fails.
 
+- **login_service_account**
+	- Login utilizing a GCP service account. The user will be granted SV permissions.
+	- To obtain the credentials you will need the email and private_key from the service account. The `private_key` comes from the `private_key` field from the `.json` keyfile for the service account.
+
 - **refresh_token**
 	- Converts a refresh_token received from a login endpoint into a regular token.
 	- The refresh_token is retrieved from a login attempt and can be stored long term in a secure location to exchange for a normal token at anytime.

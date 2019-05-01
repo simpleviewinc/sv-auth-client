@@ -204,6 +204,26 @@ class AuthPrefix {
 		
 		return result.auth.login_google;
 	}
+	async login_service_account({ email, private_key, fields }) {
+		const result = await query({
+			query : `
+				query($email: String!, $private_key: String!) {
+					auth {
+						login_service_account(email: $email, private_key: $private_key) {
+							${fields}
+						}
+					}
+				}
+			`,
+			variables : {
+				email,
+				private_key
+			},
+			url : this._graphUrl
+		});
+		
+		return result.auth.login_service_account;
+	}
 	async check_token_cache({ date, acct_id, fields, context }) {
 		context = context || this._graphServer.context;
 		
