@@ -100,6 +100,36 @@ class GraphAdminApi {
 		
 		return returnData;
 	}
+	async import({fields, context }) {
+		const method = `${this._name}_import`;
+		
+		context = context || this._graphServer.context;
+		
+		const variables = {
+			acct_id : context.acct_id
+		}
+		
+		const response = await query({
+			query : `
+				mutation($acct_id: String!) {
+					admin(acct_id: $acct_id) {
+						${method}{
+							${fields}
+						}
+					}
+				}
+			`,
+			variables,
+			url : this._graphUrl,
+			token : context.token
+		});
+		
+		const returnData = response.admin[method];
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
+	}
 }
 
 module.exports = GraphAdminApi;

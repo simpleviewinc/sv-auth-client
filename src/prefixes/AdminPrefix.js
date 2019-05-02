@@ -17,6 +17,7 @@ class AdminPrefix {
 			this[name] = api.find.bind(api);
 			this[`${name}_upsert`] = api.upsert.bind(api);
 			this[`${name}_remove`] = api.remove.bind(api);
+			this[`${name}_import`] = api.import.bind(api);
 		}
 	}
 }
