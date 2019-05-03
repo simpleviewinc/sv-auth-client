@@ -7,7 +7,7 @@ class DirectiveCheckPerm extends SchemaDirectiveVisitor {
 		field.resolve = async function(parent, args, context, info) {
 			// check if the resolver requires sv user
 			if (directiveArgs.sv === true && context.user.sv !== true) {
-				throw new Error("User is not authorization to access this resource.");
+				throw new Error("User is not authorized to access this resource.");
 			}
 			
 			// check if the resolver requires specific permissions
