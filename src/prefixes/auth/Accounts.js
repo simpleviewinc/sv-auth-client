@@ -63,22 +63,17 @@ class Accounts {
 		return returnData;
 	}
 	async remove({ filter, fields, context }) {
-		throw new Error("BROKEN NOT IMPLEMENTED!");
-		
-		const method = `${this.name}_remove`;
-		
 		context = context || this._graphServer.context;
 		
 		const variables = {
-			filter,
-			acct_id : context.acct_id
+			filter
 		}
 		
 		const response = await query({
 			query : `
-				mutation($acct_id: String!, $filter: admin_${method}_filter) {
-					admin(acct_id: $acct_id {
-						${method}(filter: $filter) {
+				mutation($filter: auth_accounts_remove_filter!) {
+					auth {
+						accounts_remove(filter: $filter) {
 							${fields}
 						}
 					}
@@ -88,6 +83,12 @@ class Accounts {
 			url : this._graphUrl,
 			token : context.token
 		});
+
+		const returnData = response.auth.accounts_remove;
+		
+		nullToUndefined(returnData)
+		
+		return returnData;
 	}
 }
 
