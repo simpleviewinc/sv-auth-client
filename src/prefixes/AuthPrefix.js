@@ -247,13 +247,13 @@ class AuthPrefix {
 		
 		return result.auth.check_token_cache;
 	}
-	async reset_data() {
+	async test_reset_data({ fields }) {
 		const rtn = await query({
 			query : `
 				mutation {
 					auth {
 						test_reset_data {
-							success
+							${fields}
 						}
 					}
 				}
@@ -265,6 +265,29 @@ class AuthPrefix {
 	}
 	async test_items(...args) {
 		return this._testItems.find(...args);
+	}
+	async setup({ context, fields }) {
+		context = context || this._graphServer.context;
+		
+		const result = await query({
+			query : `
+				mutation {
+					auth {
+						setup {
+							${fields}
+						}
+					}
+				}
+			`,
+			url : this._graphUrl,
+			token : context.token
+		});
+		
+		const returnData = result.auth.setup;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
 	}
 }
 
