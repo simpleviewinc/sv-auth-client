@@ -104,20 +104,19 @@ class AuthPrefix {
 		
 		return returnData;
 	}
-	async reset_password_start({ email, redirectUrl, fields }) {
+	async reset_password_start({ email, fields }) {
 		const result = await query({
 			query : `
-				mutation($email: String!, $redirectUrl: String!) {
+				mutation($email: String!) {
 					auth {
-						reset_password_start(email: $email, redirectUrl: $redirectUrl) {
+						reset_password_start(email: $email) {
 							${fields}
 						}
 					}
 				}
 			`,
 			variables : {
-				email,
-				redirectUrl
+				email
 			},
 			url : this._graphUrl
 		});
