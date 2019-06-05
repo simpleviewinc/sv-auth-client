@@ -252,7 +252,9 @@ class AuthPrefix {
 		
 		return result.auth.check_token_cache;
 	}
-	async test_reset_data({ fields }) {
+	async test_reset_data({ fields, context }) {
+		context = context || this._graphServer.context;
+
 		const rtn = await query({
 			query : `
 				mutation {
@@ -263,10 +265,30 @@ class AuthPrefix {
 					}
 				}
 			`,
-			url : this._graphUrl
+			url : this._graphUrl,
+			token : context.token
 		});
 		
 		return rtn.auth.test_reset_data;
+	}
+	async test_clear_data({ fields, context }) {
+		context = context || this._graphServer.context;
+
+		const rtn = await query({
+			query : `
+				mutation {
+					auth {
+						test_clear_data {
+							${fields}
+						}
+					}
+				}
+			`,
+			url : this._graphUrl,
+			token : context.token
+		});
+		
+		return rtn.auth.test_clear_data;
 	}
 	async test_items(...args) {
 		return this._testItems.find(...args);
