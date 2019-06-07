@@ -1,6 +1,13 @@
 const { SchemaDirectiveVisitor } = require("graphql-tools");
-const AuthClient = require("./AuthClient");
-const authClient = new AuthClient({ graphUrl : "http://127.0.0.1" });
+const { AuthClient } = require("./browser");
+const { GRAPHQL_URL } = process.env;
+const authClient = new AuthClient({ graphUrl : GRAPHQL_URL });
+
+
+
+console.log("auth-client", GRAPHQL_URL)
+
+
 
 class DirectiveGetUser extends SchemaDirectiveVisitor {
 	visitFieldDefinition(field) {
