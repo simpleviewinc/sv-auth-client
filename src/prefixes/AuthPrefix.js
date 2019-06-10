@@ -123,7 +123,11 @@ class AuthPrefix {
 			url : this._graphUrl
 		});
 		
-		return result.auth.reset_password_start;
+		const returnData = result.auth.reset_password_start;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
 	}
 	async update_password({ token, new_pass, fields }) {
 		const result = await query({
