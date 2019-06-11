@@ -12,7 +12,7 @@ function getDirectiveGetUser(graphUrl){
             field.resolve = async function(parent, args, context, info) {
                 // check the context token
                 if (context.token === undefined) {
-                    throw new Error("User is not authorized to access this resource.");
+                    throw new Error("User is not authorized to access this resource (ERR: 1000).");
                 }
 
                 // assign acct_id either based on the field acct_id or directive passed acct_id
@@ -25,7 +25,7 @@ function getDirectiveGetUser(graphUrl){
                 });
 
                 if (user === undefined) {
-                    throw new Error("User is not authorized to access this resource.");
+                    throw new Error("User is not authorized to access this resource (ERR: 1007).");
                 }
 
                 // assign user
