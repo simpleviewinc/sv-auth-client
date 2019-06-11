@@ -14,7 +14,7 @@ class DirectiveCheckPerm extends SchemaDirectiveVisitor {
 			if (directiveArgs.perms !== undefined) {
 				const allowed = context.user.can(directiveArgs.perms);
 				if (allowed === false) {
-					throw new Error("User is not authorized to access this resource (ERR: 1003).");
+					throw new Error("User is not authorized to access this resource (ERR: 1006).");
 				}
 			}
 			
