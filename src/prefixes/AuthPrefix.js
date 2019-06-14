@@ -252,8 +252,10 @@ class AuthPrefix {
 		
 		return result.auth.check_token_cache;
 	}
-	async test_reset_data({ fields }) {
-		const rtn = await query({
+	async test_reset_data({ fields, context }) {
+		context = context || this._graphServer.context;
+
+		const result = await query({
 			query : `
 				mutation {
 					auth {
@@ -263,10 +265,38 @@ class AuthPrefix {
 					}
 				}
 			`,
-			url : this._graphUrl
+			url : this._graphUrl,
+			token : context.token
 		});
 		
-		return rtn.auth.test_reset_data;
+		const returnData = result.auth.test_reset_data;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
+	}
+	async test_clear_data({ fields, context }) {
+		context = context || this._graphServer.context;
+
+		const result = await query({
+			query : `
+				mutation {
+					auth {
+						test_clear_data {
+							${fields}
+						}
+					}
+				}
+			`,
+			url : this._graphUrl,
+			token : context.token
+		});
+		
+		const returnData = result.auth.test_clear_data;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
 	}
 	async test_items(...args) {
 		return this._testItems.find(...args);
