@@ -4,6 +4,6 @@ const getDirectiveGetUser = require("./DirectiveGetUser");
 
 module.exports = {
 	...browser,
-	DirectiveCheckPerm,
-	getDirectiveGetUser
+	getDirectiveGetUser,
+	DirectiveCheckPerm
 }
