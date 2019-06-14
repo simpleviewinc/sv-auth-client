@@ -255,7 +255,7 @@ class AuthPrefix {
 	async test_reset_data({ fields, context }) {
 		context = context || this._graphServer.context;
 
-		const rtn = await query({
+		const result = await query({
 			query : `
 				mutation {
 					auth {
@@ -269,12 +269,16 @@ class AuthPrefix {
 			token : context.token
 		});
 		
-		return rtn.auth.test_reset_data;
+		const returnData = result.auth.test_reset_data;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
 	}
 	async test_clear_data({ fields, context }) {
 		context = context || this._graphServer.context;
 
-		const rtn = await query({
+		const result = await query({
 			query : `
 				mutation {
 					auth {
@@ -288,7 +292,11 @@ class AuthPrefix {
 			token : context.token
 		});
 		
-		return rtn.auth.test_clear_data;
+		const returnData = result.auth.test_clear_data;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
 	}
 	async test_items(...args) {
 		return this._testItems.find(...args);
