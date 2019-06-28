@@ -377,6 +377,55 @@ This section is provided to provide additional information about the GraphQL end
 	}
 	```
 
+You can define your permissions structure in a natural tree shape with the supplied Permissions utilities.
+
+Rather than
+```
+[{
+  "name": "bi.admin",
+  "label": "Admin",
+  "description": "Powerful Permissions for Professionals Only"
+},
+{
+  "name": "bi.admin.database_connection",
+  "label": "Database Connection",
+  "description": "Database Connection Permissions"
+},
+{
+  "name": "bi.admin.database_connection.read",
+  "label": "Read",
+  "permType": "read"
+},
+{
+  "name": "bi.admin.database_connection.write",
+  "label": "Write",
+  "permType": "write"
+},
+{
+  "name": "bi.admin.database_connection.remove",
+  "label": "Remove",
+  "permType": "remove"
+}]
+```
+
+Something like
+```
+{
+	admin: {
+		[$Descr]: 'Powerful Permissions for Professionals Only',
+		database_connection: {
+			read,
+			write,
+			remove
+		}
+  }
+}
+```
+
+Actually, the former is exactly what the latter compiles out to. Nest to your heart's content, of course.
+
+See permissions/example.js on how to use the utility (it's pretty straightforward).
+
 - **roles_upsert**
 	- Provided an `id`, updates the associated role or inserts one if it does not exist.
 	```
@@ -444,9 +493,6 @@ This section is provided to provide additional information about the GraphQL end
 		}
 	}
 	```
-
-
-
 
 # Development
 
