@@ -2,6 +2,7 @@ const { query, GraphServer } = require("@simpleview/sv-graphql-client");
 const { AuthClient, User, AdminPrefix, AuthPrefix, isCommonPassword } = require("../");
 const assert = require("assert");
 const mochaLib = require("@simpleview/mochalib");
+const fs = require("fs");
 
 const GRAPH_URL = "https://graphql.kube.simpleview.io/";
 
@@ -12,7 +13,26 @@ describe(__filename, function() {
 	let login1;
 	
 	before(async function() {
-		await graphServer.auth.reset_data();
+		this.timeout(5000);
+		
+		const serviceJson = JSON.parse(fs.readFileSync(`${__dirname}/../auth_test.serviceAccount.json`));
+		const serviceLogin = await graphServer.auth.login_service_account({
+			email : serviceJson.client_email,
+			private_key : serviceJson.private_key,
+			fields : `success message token`
+		});
+		
+		assert.strictEqual(serviceLogin.success, true);
+		
+		const resetResult = await graphServer.auth.test_reset_data({
+			context : {
+				token : serviceLogin.token,
+			},
+			fields : `success message`
+		});
+		
+		assert.strictEqual(resetResult.success, true);
+		
 		login1 = await graphServer.auth.login({
 			email : "test0@test.com",
 			password : "test",
@@ -31,17 +51,17 @@ describe(__filename, function() {
 	it("should return user from cache", async function() {
 		const user = await authClient.getUser({
 			token : login1.token,
-			acct_id : "0"
+			acct_id : "test-0"
 		});
 		
 		const expectUser = {
 			id : "000000000000000000000030",
 			sv : false,
-			acct_id : "0",
+			acct_id : "test-0",
 			firstname : "Test",
 			lastname : "User",
 			email : "test0@test.com",
-			permissionJson : JSON.stringify({ cms : true }),
+			permissionJson : JSON.stringify({ admin : true, cms : true }),
 			active : true
 		}
 		
@@ -53,7 +73,7 @@ describe(__filename, function() {
 	it("should return the same item from cache", async function() {
 		const user = await authClient.getUser({
 			token : login1.token,
-			acct_id : "0"
+			acct_id : "test-0"
 		});
 		
 		assert.strictEqual(user.email, "test0@test.com");
@@ -61,7 +81,7 @@ describe(__filename, function() {
 		
 		const user2 = await authClient.getUser({
 			token : login1.token,
-			acct_id : "0"
+			acct_id : "test-0"
 		});
 		
 		assert.strictEqual(user2.email, "test0@test.com");
@@ -75,12 +95,12 @@ describe(__filename, function() {
 	it("should bypass cache on user change", async function() {
 		const user = await authClient.getUser({
 			token : login1.token,
-			acct_id : "0"
+			acct_id : "test-0"
 		});
 		
 		const user2 = await authClient.getUser({
 			token : login1.token,
-			acct_id : "0"
+			acct_id : "test-0"
 		});
 		
 		assert.strictEqual(user, user2);
@@ -95,14 +115,14 @@ describe(__filename, function() {
 			},
 			fields : `success message`,
 			context : {
-				acct_id : "0",
+				acct_id : "test-0",
 				token : login1.token
 			}
 		});
 		
 		const user3 = await authClient.getUser({
 			token : login1.token,
-			acct_id : "0"
+			acct_id : "test-0"
 		});
 		
 		assert.strictEqual(user3.firstname, "Changed");
@@ -111,12 +131,12 @@ describe(__filename, function() {
 	});
 	
 	it("should return undefined on bad token", async function() {
-		const user = await authClient.getUser({
-			token : "bogus",
-			acct_id : "0"
-		});
-		
-		assert.strictEqual(user, undefined);
+		assert.rejects(async () => {
+			const user = await authClient.getUser({
+				token : "bogus",
+				acct_id : "test-0"
+			});
+		}, /User is not authorized to access this resource \(ERR: 1001\)\./);
 	});
 
 	it("should pass common password check", async function() {
