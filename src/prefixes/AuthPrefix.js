@@ -104,21 +104,19 @@ class AuthPrefix {
 		
 		return returnData;
 	}
-	async reset_password_start({ email, account_name, product, fields }) {
+	async reset_password_start({ input, fields }) {
 		const result = await query({
 			query : `
-				mutation($email: String! $account_name: String, $product: String) {
+				mutation($input : auth_reset_password_start!) {
 					auth {
-						reset_password_start(email: $email, account_name: $account_name, product: $product) {
+						reset_password_start(input: $input) {
 							${fields}
 						}
 					}
 				}
 			`,
 			variables : {
-				email,
-				account_name,
-				product
+				input
 			},
 			url : this._graphUrl
 		});
@@ -169,12 +167,12 @@ class AuthPrefix {
 		
 		return result.auth.refresh_token;
 	}
-	async login({ email, password, fields }) {
+	async login({ input, fields }) {
 		const result = await query({
 			query : `
-				query($email: String!, $password: String!) {
+				query($input : auth_login!) {
 					auth {
-						login(email: $email, password: $password) {
+						login(input : $input) {
 							${fields}
 						}
 					}
@@ -182,8 +180,7 @@ class AuthPrefix {
 				}
 			`,
 			variables : {
-				email,
-				password
+				input
 			},
 			url : this._graphUrl
 		});
@@ -209,20 +206,19 @@ class AuthPrefix {
 		
 		return result.auth.login_google;
 	}
-	async login_service_account({ email, private_key, fields }) {
+	async login_service_account({ input, fields }) {
 		const result = await query({
 			query : `
-				query($email: String!, $private_key: String!) {
+				query($input : auth_login_service_account!) {
 					auth {
-						login_service_account(email: $email, private_key: $private_key) {
+						login_service_account(input: $input) {
 							${fields}
 						}
 					}
 				}
 			`,
 			variables : {
-				email,
-				private_key
+				input
 			},
 			url : this._graphUrl
 		});
