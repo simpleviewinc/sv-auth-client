@@ -4,7 +4,7 @@ const assert = require("assert");
 const mochaLib = require("@simpleview/mochalib");
 const fs = require("fs");
 
-const GRAPH_URL = "https://graphql.kube.simpleview.io/";
+const GRAPH_URL = "https://graphql.kube.simpleview.io/link/auth-v2/";
 
 const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AdminPrefix, AuthPrefix] });
 const authClient = new AuthClient({ graphUrl : GRAPH_URL });
@@ -17,8 +17,10 @@ describe(__filename, function() {
 		
 		const serviceJson = JSON.parse(fs.readFileSync(`${__dirname}/../auth_test.serviceAccount.json`));
 		const serviceLogin = await graphServer.auth.login_service_account({
-			email : serviceJson.client_email,
-			private_key : serviceJson.private_key,
+			input : {
+				email : serviceJson.client_email,
+				private_key : serviceJson.private_key
+			},
 			fields : `success message token`
 		});
 		
@@ -34,8 +36,10 @@ describe(__filename, function() {
 		assert.strictEqual(resetResult.success, true);
 		
 		login1 = await graphServer.auth.login({
-			email : "test0@test.com",
-			password : "test",
+			input : {
+				email : "test0@test.com",
+				password : "test"
+			},
 			fields : `success message token`
 		});
 	});
