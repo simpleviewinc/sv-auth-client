@@ -107,7 +107,7 @@ class AuthPrefix {
 	async reset_password_start({ input, fields }) {
 		const result = await query({
 			query : `
-				mutation($input : auth_reset_password_start!) {
+				mutation($input : auth_reset_password_start_input!) {
 					auth {
 						reset_password_start(input: $input) {
 							${fields}
@@ -170,7 +170,7 @@ class AuthPrefix {
 	async login({ input, fields }) {
 		const result = await query({
 			query : `
-				query($input : auth_login!) {
+				query($input : auth_login_input!) {
 					auth {
 						login(input : $input) {
 							${fields}
@@ -209,7 +209,7 @@ class AuthPrefix {
 	async login_service_account({ input, fields }) {
 		const result = await query({
 			query : `
-				query($input : auth_login_service_account!) {
+				query($input : auth_login_service_account_input!) {
 					auth {
 						login_service_account(input: $input) {
 							${fields}
