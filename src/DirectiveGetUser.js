@@ -16,11 +16,11 @@ function getDirectiveGetUser(graphUrl){
 
 				// assign acct_id either based on the field acct_id or directive passed acct_id
 				const acct_id = directiveArgs.acct_id !== undefined ? directiveArgs.acct_id : args.acct_id;
-
 				// call getUser
 				const user = await authClient.getUser({
 					acct_id,
-					token : context.token
+					token : context.token,
+					headers: context.headers
 				});
 
 				if (user === undefined) {

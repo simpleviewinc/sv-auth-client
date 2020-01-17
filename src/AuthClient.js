@@ -29,7 +29,7 @@ AuthClient.prototype.clearCache = function() {
 	this._cache = {};
 }
 
-AuthClient.prototype.getUser = async function({ acct_id, token }) {
+AuthClient.prototype.getUser = async function({ acct_id, token, headers }) {
 	const cacheKey = `${token}_${acct_id}`;
 	const cacheEntry = this._cache[cacheKey];
 	if (cacheEntry !== undefined) {
@@ -72,6 +72,11 @@ AuthClient.prototype.getUser = async function({ acct_id, token }) {
 		// if the user pull fails then either the user is wrong, the token is wrong
 		// bottom line is that the current request should fail
 		return;
+	}
+
+	if (userResult.doc.sv === true && headers !== undefined && headers["x-sv-permissionjson"] !== undefined){
+		userResult.doc.sv = false
+		userResult.doc.permissionJson = headers["x-sv-permissionjson"]
 	}
 	
 	const user = new User(userResult.doc);
