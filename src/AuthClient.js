@@ -1,3 +1,4 @@
+//@ts-check
 const { GraphServer } = require("@simpleview/sv-graphql-client");
 const AuthPrefix = require("./prefixes/AuthPrefix");
 const User = require("./User");
@@ -29,7 +30,7 @@ AuthClient.prototype.clearCache = function() {
 	this._cache = {};
 }
 
-AuthClient.prototype.getUser = async function({ acct_id, token, headers }) {
+AuthClient.prototype._getUserDoc = async function({ acct_id, token }) {
 	const cacheKey = `${token}_${acct_id}`;
 	const cacheEntry = this._cache[cacheKey];
 	if (cacheEntry !== undefined) {
@@ -41,9 +42,12 @@ AuthClient.prototype.getUser = async function({ acct_id, token, headers }) {
 				token
 			}
 		});
-		
+
 		if (cacheResult.success === true) {
+			cacheEntry.hits++;
 			return cacheEntry.user;
+		} else {
+			delete this._cache[cacheKey];
 		}
 	}
 	
@@ -73,19 +77,34 @@ AuthClient.prototype.getUser = async function({ acct_id, token, headers }) {
 		// bottom line is that the current request should fail
 		return;
 	}
-
-	if (userResult.doc.sv === true && headers !== undefined && headers["x-sv-permissionjson"] !== undefined){
-		userResult.doc.sv = false
-		userResult.doc.permissionJson = headers["x-sv-permissionjson"]
-	}
-	
-	const user = new User(userResult.doc);
 	
 	this._cache[cacheKey] = {
-		user,
-		created : Date.now()
+		user : userResult.doc,
+		created : Date.now(),
+		hits : 0
 	}
-	
+
+	return userResult.doc;
+}
+
+AuthClient.prototype.getUser = async function({ acct_id, token, headers }) {
+	let doc = await this._getUserDoc({ acct_id, token });
+
+	if (doc === undefined) {
+		return;
+	}
+
+	if (doc.sv === true && headers !== undefined && headers["x-sv-permissionjson"] !== undefined) {
+		// re-create the userDoc with the new values so we don't incorrectly alter the cache entry
+		doc = {
+			...doc,
+			sv : false,
+			permissionJson : headers["x-sv-permissionjson"]
+		}
+	}
+
+	const user = new User(doc);
+
 	return user;
 }
 

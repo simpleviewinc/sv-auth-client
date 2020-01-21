@@ -11,12 +11,13 @@ const authClient = new AuthClient({ graphUrl : GRAPH_URL });
 
 describe(__filename, function() {
 	let login1;
+	let serviceLogin;
 	
 	before(async function() {
 		this.timeout(5000);
 		
 		const serviceJson = JSON.parse(fs.readFileSync(`${__dirname}/../auth_test.serviceAccount.json`));
-		const serviceLogin = await graphServer.auth.login_service_account({
+		serviceLogin = await graphServer.auth.login_service_account({
 			input : {
 				email : serviceJson.client_email,
 				private_key : serviceJson.private_key
@@ -75,6 +76,8 @@ describe(__filename, function() {
 	});
 	
 	it("should return the same item from cache", async function() {
+		const cacheKey = `${login1.token}_test-0`;
+
 		const user = await authClient.getUser({
 			token : login1.token,
 			acct_id : "test-0"
@@ -82,7 +85,8 @@ describe(__filename, function() {
 		
 		assert.strictEqual(user.email, "test0@test.com");
 		assert.strictEqual(authClient.cacheLength, 1);
-		
+		assert.strictEqual(authClient._cache[cacheKey].hits, 0);
+
 		const user2 = await authClient.getUser({
 			token : login1.token,
 			acct_id : "test-0"
@@ -90,10 +94,9 @@ describe(__filename, function() {
 		
 		assert.strictEqual(user2.email, "test0@test.com");
 		assert.strictEqual(authClient.cacheLength, 1);
-		
-		// by strictEqual checking user and user2 we prove it came from cache as we were returned
-		// the same by-reference entity
-		assert.strictEqual(user, user2);
+		assert.strictEqual(authClient._cache[cacheKey].hits, 1);
+
+		assert.deepStrictEqual(user, user2);
 	});
 	
 	it("should bypass cache on user change", async function() {
@@ -107,7 +110,7 @@ describe(__filename, function() {
 			acct_id : "test-0"
 		});
 		
-		assert.strictEqual(user, user2);
+		assert.deepStrictEqual(user, user2);
 		
 		const upsertResult = await graphServer.admin.users_upsert({
 			input : {
@@ -133,6 +136,56 @@ describe(__filename, function() {
 		assert.notStrictEqual(user, user3);
 		assert.strictEqual(authClient.cacheLength, 1);
 	});
+
+	it("should bypass cache if old", async function() {
+		const cacheKey = `${login1.token}_test-0`;
+		
+		const getUser = async function() {
+			return authClient.getUser({
+				token : login1.token,
+				acct_id : "test-0"
+			});
+		}
+
+		await getUser();
+
+		assert.strictEqual(authClient._cache[cacheKey].hits, 0);
+
+		await getUser();
+
+		assert.strictEqual(authClient._cache[cacheKey].hits, 1);
+
+		// clock the time to the past, so that the next request gets a fresh one
+		authClient._cache[cacheKey].created = Date.now() - (1000 * 60 * 60 * 24);
+
+		await getUser();
+
+		assert.strictEqual(authClient._cache[cacheKey].hits, 0);
+	});
+
+	it("should allow overwriting permissionJson on sv token", async function() {
+		const user = await authClient.getUser({
+			token : serviceLogin.token,
+			acct_id : "test-0",
+			headers : {
+				"x-sv-permissionjson" : JSON.stringify({ admin : false })
+			}
+		});
+
+		assert.deepStrictEqual(user.permissionObj, { admin : false });
+	});
+
+	it("should now allow overwriting permissionJson for non-sv", async function() {
+		const user = await authClient.getUser({
+			token : login1.token,
+			acct_id : "test-0",
+			headers : {
+				"x-sv-permissionjson" : JSON.stringify({ admin : false })
+			}
+		});
+
+		assert.deepStrictEqual(user.permissionObj, {});
+	})
 	
 	it("should return undefined on bad token", async function() {
 		assert.rejects(async () => {
