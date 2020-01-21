@@ -37,6 +37,7 @@ Generally you will want to make this call very early in your GraphQL stack in or
 * args
 	* token - string - The jwt token retrieved from the the auth system.
 	* acct_id - string - The acct_id that you need to retrieve the user for.
+	* headers - object - HTTP headers, x-sv-permissionjson can be used for overwriting user permissions in unit tests.
 
 Returns `auth_user`.
 
@@ -101,6 +102,21 @@ query {
 ```
 
 Add `DirectiveCheckPerm` class to your `schemaDirectives` object using the key name `prefix_checkPerm`.
+
+## DirectiveGetUser
+
+`DirectiveGetUser` can be used to convert a token into a user session. Add `DirectiveGetUser` class to your `schemaDirectives` object using key name `prefix_getUser`.
+
+When using the directive, if your system passes the request headers object on context, you can utilize the header `x-sv-permissionjson` to set the permissions for a specific request. This is can only be used if the token is `sv : true` and is effectively reducing the permissions of that specific request. This makes unit tests easier as you don't need to create roles and users for each specific cross section of permission testing.
+
+In graphql schema.
+```
+directive prefix_checkPerm;
+
+query {
+	prefix: some_result @prefix_getUser
+}
+```
 
 ## User
 
