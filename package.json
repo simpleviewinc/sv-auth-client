@@ -15,7 +15,7 @@
 	"main": "src/index.js",
 	"browser": "src/browser.js",
 	"scripts": {
-		"test": "mocha testing",
+		"test": "mocha testing --check-leaks",
 		"docker": "./dev/build && ./dev/run || true",
 		"publish": "./dev/publish"
 	},
