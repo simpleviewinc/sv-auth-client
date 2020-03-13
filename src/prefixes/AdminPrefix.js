@@ -51,7 +51,7 @@ class AdminPrefix {
 		
 		return returnData;
 	}
-	async users_send_invitation({input, fields, context }) {
+	async users_send_invitation({ input, fields, context }) {
 		context = context || this._graphServer.context;
 		
 		const variables = {
@@ -61,7 +61,7 @@ class AdminPrefix {
 		
 		const response = await query({
 			query : `
-				mutation($acct_id: String!, $input: admin_users_send_invitation!) {
+				mutation($acct_id: String!, $input: admin_users_send_invitation_input!) {
 					admin(acct_id: $acct_id) {
 						users_send_invitation(input: $input){
 							${fields}
