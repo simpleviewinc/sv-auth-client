@@ -51,6 +51,35 @@ class AdminPrefix {
 		
 		return returnData;
 	}
+	async users_send_invitation({ input, fields, context }) {
+		context = context || this._graphServer.context;
+		
+		const variables = {
+			input,
+			acct_id : context.acct_id
+		}
+		
+		const response = await query({
+			query : `
+				mutation($acct_id: String!, $input: admin_users_send_invitation_input!) {
+					admin(acct_id: $acct_id) {
+						users_send_invitation(input: $input){
+							${fields}
+						}
+					}
+				}
+			`,
+			variables,
+			url : this._graphUrl,
+			token : context.token
+		});
+		
+		const returnData = response.admin.users_send_invitation;
+		
+		nullToUndefined(returnData);
+		
+		return returnData;
+	}
 	async setup({ context, fields }) {
 		context = context || this._graphServer.context;
 		
