@@ -6,7 +6,7 @@ class GraphAdminApi {
 		this._name = name;
 		this._graphServer = graphServer;
 	}
-	async find({ filter, options, fields, context }) {
+	async find({ filter, options, fields, context, headers }) {
 		const method = this._name;
 		
 		context = context || this._graphServer.context;
@@ -29,7 +29,8 @@ class GraphAdminApi {
 			`,
 			variables,
 			url : this._graphUrl,
-			token : context.token
+			token : context.token,
+			headers
 		});
 		
 		const returnData = response.admin[this._name];
@@ -38,7 +39,7 @@ class GraphAdminApi {
 		
 		return returnData;
 	}
-	async upsert({ input, fields, context }) {
+	async upsert({ input, fields, context, headers }) {
 		const method = `${this._name}_upsert`;
 		
 		context = context || this._graphServer.context;
@@ -60,7 +61,8 @@ class GraphAdminApi {
 			`,
 			variables,
 			url : this._graphUrl,
-			token : context.token
+			token : context.token,
+			headers
 		});
 		
 		const returnData = response.admin[method];
@@ -69,7 +71,7 @@ class GraphAdminApi {
 		
 		return returnData;
 	}
-	async remove({ filter, fields, context }) {
+	async remove({ filter, fields, context, headers }) {
 		const method = `${this._name}_remove`;
 		
 		context = context || this._graphServer.context;
@@ -91,7 +93,8 @@ class GraphAdminApi {
 			`,
 			variables,
 			url : this._graphUrl,
-			token : context.token
+			token : context.token,
+			headers
 		});
 		
 		const returnData = response.admin[method];
