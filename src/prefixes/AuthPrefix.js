@@ -242,7 +242,7 @@ class AuthPrefix {
 			url : this._graphUrl
 		});
 		
-		return result.auth.login_google;
+		return result.auth.login_sso_token;
 	}
 	async check_token_cache({ date, acct_id, fields, context }) {
 		context = context || this._graphServer.context;
