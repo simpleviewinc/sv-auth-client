@@ -67,6 +67,10 @@ describe(__filename, function() {
 			lastname : "User",
 			email : "test0@test.com",
 			permissionJson : JSON.stringify({ admin : true, cms : true }),
+			auth_user_id : {
+				type : "admin.user",
+				value : "test0@test.com",
+			},
 			active : true
 		}
 		

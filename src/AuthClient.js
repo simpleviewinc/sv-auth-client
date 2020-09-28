@@ -64,6 +64,10 @@ AuthClient.prototype._getUserDoc = async function({ acct_id, token }) {
 				lastname
 				email
 				permissionJson
+				auth_user_id {
+					type
+					value
+				}
 				active
 			}
 		`,
