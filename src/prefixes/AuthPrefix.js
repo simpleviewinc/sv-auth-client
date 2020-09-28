@@ -225,6 +225,25 @@ class AuthPrefix {
 		
 		return result.auth.login_service_account;
 	}
+	async login_sso_token({ input, fields }) {
+		const result = await query({
+			query : `
+				query($input: auth_login_sso_token_input!) {
+					auth {
+						login_sso_token(input: $input) {
+							${fields}
+						}
+					}
+				}
+			`,
+			variables : {
+				input
+			},
+			url : this._graphUrl
+		});
+
+		return result.auth.login_sso_token;
+	}
 	async check_token_cache({ date, acct_id, fields, context }) {
 		context = context || this._graphServer.context;
 		
