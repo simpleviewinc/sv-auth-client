@@ -110,6 +110,15 @@ class AdminPrefix {
 		
 		return returnData;
 	}
+	/**
+	 * @param {object} args
+	 * @param {object} [args.filter]
+	 * @param {string|string[]} [args.filter.perms]
+	 * @param {string|string[]} [args.filter.node_type]
+	 * @param {string} args.fields
+	 * @param {object} [args.context]
+	 * @param {object} [args.headers]
+	 */
 	async object_bindings_mine({ filter, fields, context, headers }) {
 		context = context || this._graphServer.context;
 
