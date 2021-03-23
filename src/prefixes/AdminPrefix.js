@@ -110,6 +110,45 @@ class AdminPrefix {
 		
 		return returnData;
 	}
+	/**
+	 * @param {object} args
+	 * @param {object} [args.filter]
+	 * @param {string|string[]} [args.filter.perms]
+	 * @param {string|string[]} [args.filter.node_type]
+	 * @param {string} args.fields
+	 * @param {object} [args.context]
+	 * @param {object} [args.headers]
+	 */
+	async object_bindings_mine({ filter, fields, context, headers }) {
+		context = context || this._graphServer.context;
+
+		const variables = {
+			filter,
+			acct_id : context.acct_id
+		}
+		
+		const result = await query({
+			query : `
+				query($acct_id: String!, $filter: admin_object_bindings_mine_filter) {
+					admin(acct_id: $acct_id) {
+						object_bindings_mine(filter: $filter) {
+							${fields}
+						}
+					}
+				}
+			`,
+			variables,
+			url : this._graphUrl,
+			token : context.token,
+			headers
+		});
+		
+		const returnData = result.admin.object_bindings_mine;
+		
+		nullToUndefined(returnData)
+		
+		return returnData;
+	}
 }
 
 module.exports = AdminPrefix;
