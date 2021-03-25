@@ -6,4 +6,4 @@ docker run --rm -it \
 	-v $PWD/../sv-graphql-client/src/:/app/node_modules/@simpleview/sv-graphql-client \
 	-v /sv/applications/sv-auth/containers/graphql-v2/lib/test/auth_test.serviceAccount.json:/app/auth_test.serviceAccount.json \
 	--add-host=graphql.kube.simpleview.io:192.168.50.100 \
-	sv-auth-client:local /bin/sh
+	sv-auth-client:local /bin/bash
