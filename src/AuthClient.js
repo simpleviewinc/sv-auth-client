@@ -14,6 +14,9 @@ function AuthClient({ graphUrl, cacheDuration = 1000 * 60 * 60 }) {
 			}
 		}
 	}, cacheDuration);
+
+	// unref the interval so that it doesn't keep the process open
+	this._interval.unref();
 }
 
 Object.defineProperty(AuthClient.prototype, "cacheLength", {
