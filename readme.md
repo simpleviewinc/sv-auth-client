@@ -18,7 +18,7 @@ npm install @simpleview/sv-auth-client
 
 ## Setup
 
-For integrating your project with auth, please see the [Setup Instructions](SETUP.md).
+For integrating your project with auth, please see the [Setup Instructions](setup.md).
 
 # Package API
 
