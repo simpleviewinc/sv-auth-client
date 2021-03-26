@@ -117,7 +117,7 @@ module.exports = getDirectiveGetUser({ name : NAME, graphUrl : AUTH_URL })
 module.exports = getDirectiveGetUser({ name : "redirects_checkPerm", graphUrl : "https://graphql.simpleviewinc.com/link/auth-v2/" })
 ```
 
-If you are not using `schemaLoader` then `getDirectiveGetUser()` returns `{ schemaDirectives, typeDefs }` and you can manually integrate those with your existing directives and schema files.
+If you are not using `schemaLoader`, `getDirectiveGetUser()` returns `{ schemaDirectives, typeDefs }` and you can manually integrate those with your existing directives and schema files.
 
 ### Using DirectiveGetUser
 
@@ -144,7 +144,7 @@ The recommended approach is to split out a separate file in your schema to inclu
 
 Note: You will need to provide `name`, which should be `PREFIX_checkPerm` and `graphUrl` which should point to the version of auth you are accessing.
 
-```
+```js
 const {
 	getDirectiveCheckPerm
 } = require("@simpleview/sv-auth-client");
@@ -155,7 +155,7 @@ module.exports = getDirectiveCheckPerm({ name : NAME, graphUrl : AUTH_URL });
 module.exports = getDirectiveCheckPerm({ name : "redirects_checkPerm", graphUrl : "https://graphql.simpleviewinc.com/link/auth-v2/" });
 ```
 
-If you are not using `schemaLoader` then `getDirectiveGetUser()` returns `{ schemaDirectives, typeDefs }` and you can manually integrate those with your existing directives and schema files.
+If you are not using `schemaLoader`, `getDirectiveGetUser()` returns `{ schemaDirectives, typeDefs }` and you can manually integrate those with your existing directives and schema files.
 
 ### Using the directive
 
