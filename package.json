@@ -10,7 +10,8 @@
 	},
 	"devDependencies": {
 		"@simpleview/mochalib": "1.0.1",
-		"mocha": "5.2.0"
+		"mocha": "5.2.0",
+		"apollo-server": "2.21.2"
 	},
 	"main": "src/index.js",
 	"browser": "src/browser.js",

@@ -1,48 +1,25 @@
-const { query, GraphServer } = require("@simpleview/sv-graphql-client");
+const { GraphServer } = require("@simpleview/sv-graphql-client");
 const { AuthClient, User, AdminPrefix, AuthPrefix, isCommonPassword } = require("../");
 const assert = require("assert");
 const mochaLib = require("@simpleview/mochalib");
-const fs = require("fs");
+const testServers = require("../src/testServers");
 
 const GRAPH_URL = "https://graphql.kube.simpleview.io/link/auth-v2/";
 
 const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AdminPrefix, AuthPrefix] });
-const authClient = new AuthClient({ graphUrl : GRAPH_URL });
 
 describe(__filename, function() {
 	let login1;
-	let serviceLogin;
+	let authClient;
 	
 	before(async function() {
 		this.timeout(5000);
 		
-		const serviceJson = JSON.parse(fs.readFileSync(`${__dirname}/../auth_test.serviceAccount.json`));
-		serviceLogin = await graphServer.auth.login_service_account({
-			input : {
-				email : serviceJson.client_email,
-				private_key : serviceJson.private_key
-			},
-			fields : `success message token`
-		});
-		
-		assert.strictEqual(serviceLogin.success, true);
-		
-		const resetResult = await graphServer.auth.test_reset_data({
-			context : {
-				token : serviceLogin.token,
-			},
-			fields : `success message`
-		});
-		
-		assert.strictEqual(resetResult.success, true);
-		
-		login1 = await graphServer.auth.login({
-			input : {
-				email : "test0@test.com",
-				password : "test"
-			},
-			fields : `success message token`
-		});
+		await testServers.init();
+
+		login1 = testServers.acct0test0.context.token;
+
+		authClient = new AuthClient({ graphUrl : GRAPH_URL });
 	});
 	
 	beforeEach(async function() {
@@ -55,7 +32,7 @@ describe(__filename, function() {
 	
 	it("should return user from cache", async function() {
 		const user = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0"
 		});
 		
@@ -80,10 +57,10 @@ describe(__filename, function() {
 	});
 	
 	it("should return the same item from cache", async function() {
-		const cacheKey = `${login1.token}_test-0`;
+		const cacheKey = `${login1}_test-0`;
 
 		const user = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0"
 		});
 		
@@ -92,7 +69,7 @@ describe(__filename, function() {
 		assert.strictEqual(authClient._cache[cacheKey].hits, 0);
 
 		const user2 = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0"
 		});
 		
@@ -105,12 +82,12 @@ describe(__filename, function() {
 	
 	it("should bypass cache on user change", async function() {
 		const user = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0"
 		});
 		
 		const user2 = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0"
 		});
 		
@@ -127,12 +104,12 @@ describe(__filename, function() {
 			fields : `success message`,
 			context : {
 				acct_id : "test-0",
-				token : login1.token
+				token : login1
 			}
 		});
 		
 		const user3 = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0"
 		});
 		
@@ -142,11 +119,11 @@ describe(__filename, function() {
 	});
 
 	it("should bypass cache if old", async function() {
-		const cacheKey = `${login1.token}_test-0`;
+		const cacheKey = `${login1}_test-0`;
 		
 		const getUser = async function() {
 			return authClient.getUser({
-				token : login1.token,
+				token : login1,
 				acct_id : "test-0"
 			});
 		}
@@ -169,7 +146,7 @@ describe(__filename, function() {
 
 	it("should allow overwriting permissionJson on sv token", async function() {
 		const user = await authClient.getUser({
-			token : serviceLogin.token,
+			token : testServers.authGraphServer.context.token,
 			acct_id : "test-0",
 			headers : {
 				"x-sv-permissionjson" : JSON.stringify({ admin : false })
@@ -181,7 +158,7 @@ describe(__filename, function() {
 
 	it("should now allow overwriting permissionJson for non-sv", async function() {
 		const user = await authClient.getUser({
-			token : login1.token,
+			token : login1,
 			acct_id : "test-0",
 			headers : {
 				"x-sv-permissionjson" : JSON.stringify({ admin : false })

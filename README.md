@@ -8,6 +8,8 @@ Use cases include:
 * Wrapping the UI of your product behind the auth system.
 * Converting a token into a user and checking their permissions.
 
+[Changelog](changelog.md) - See the latest changes to sv-auth-client.
+
 ## Installation
 
 ```
@@ -19,6 +21,10 @@ npm install @simpleview/sv-auth-client
 For integrating your project with auth, please see the [Setup Instructions](SETUP.md).
 
 # Package API
+
+* [AuthClient](#AuthClient)
+* [DirectiveGetUser](#DirectiveGetUser)
+* [DirectiveCheckPerm](#DirectiveCheckPerm)
 
 ## AuthClient
 
@@ -88,33 +94,89 @@ const { GraphServer } = require("@simpleview/sv-graphql-client");
 const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AuthPrefix] });
 ```
 
-## DirectiveCheckPerm
+## DirectiveGetUser
 
-`DirectiveCheckPerm` can be used to enforce permissions to access a resolver.
+`DirectiveGetUser` can be used to convert a token into a user session.
 
-In graphql schema.
+When using the directive, if your system passes the request headers object on context, you can utilize the header `x-sv-permissionjson` to set the permissions for a specific request. This is can only be used if the token is `sv : true` and it reduces the permissions of that specific request. This makes unit tests easier as you don't need to create roles and users for each specific cross section of permission testing.
+
+### Adding DirectiveGetUser
+
+The recommended approach is to split out a separate file in your schema to include the directive.
+
+Note: You will need to provide `name`, which should be `PREFIX_getUser` and `graphUrl` which should point to the version of auth you are accessing.
+
+```js
+const {
+	getDirectiveGetUser
+} = require("@simpleview/sv-auth-client");
+
+module.exports = getDirectiveGetUser({ name : NAME, graphUrl : AUTH_URL })
+
+// example
+module.exports = getDirectiveGetUser({ name : "redirects_checkPerm", graphUrl : "https://graphql.simpleviewinc.com/link/auth-v2/" })
 ```
-directive prefix_checkPerm;
 
+If you are not using `schemaLoader` then `getDirectiveGetUser()` returns `{ schemaDirectives, typeDefs }` and you can manually integrate those with your existing directives and schema files.
+
+### Using DirectiveGetUser
+
+The directive is usually best applied to your root resolver, and requires that your root resolver has a acct_id has a top-level filter parameter. This is best used in conjunction with the `checkPerm` resolver to enforce the permissions on that user.
+
+In the below example, the top-level prefix converts the token into a user, then the specific resolver enforces permissions based on that user.
+
+```
 query {
-	someResolver: some_result @prefix_checkPerm(perms: ["perm.name"])
+	prefix(acct_id: String): prefix_query @prefix_getUser
+	
+	type prefix_query {
+		some_endpoint: some_result @prefix_checkPerm(sv: true)
+	}
 }
 ```
 
-Add `DirectiveCheckPerm` class to your `schemaDirectives` object using the key name `prefix_checkPerm`.
+## DirectiveCheckPerm
 
-## DirectiveGetUser
+`DirectiveCheckPerm` can be used to enforce permissions to access a resolver. It can enforce permissions based on `sv`, `permissions` or retrieve `object_bindings`.
 
-`DirectiveGetUser` can be used to convert a token into a user session. Add `DirectiveGetUser` class to your `schemaDirectives` object using key name `prefix_getUser`.
+### Adding the Directive
+The recommended approach is to split out a separate file in your schema to include the directive.
 
-When using the directive, if your system passes the request headers object on context, you can utilize the header `x-sv-permissionjson` to set the permissions for a specific request. This is can only be used if the token is `sv : true` and is effectively reducing the permissions of that specific request. This makes unit tests easier as you don't need to create roles and users for each specific cross section of permission testing.
+Note: You will need to provide `name`, which should be `PREFIX_checkPerm` and `graphUrl` which should point to the version of auth you are accessing.
 
-In graphql schema.
 ```
-directive prefix_checkPerm;
+const {
+	getDirectiveCheckPerm
+} = require("@simpleview/sv-auth-client");
 
+module.exports = getDirectiveCheckPerm({ name : NAME, graphUrl : AUTH_URL });
+
+// example
+module.exports = getDirectiveCheckPerm({ name : "redirects_checkPerm", graphUrl : "https://graphql.simpleviewinc.com/link/auth-v2/" });
+```
+
+If you are not using `schemaLoader` then `getDirectiveGetUser()` returns `{ schemaDirectives, typeDefs }` and you can manually integrate those with your existing directives and schema files.
+
+### Using the directive
+
+* perms - [String] - An array of permissions this endpoint requires.
+* sv - Boolean - Whether this endpoint requires an SV user.
+* bindings
+  *  perms - [String] - The permissions for bindings to return
+  *  node_types - [String] - The node_types to return binding information on.
+
+```
 query {
-	prefix: some_result @prefix_getUser
+	# require SV user
+	some_query: some_result @prefix_checkPerm(sv: true)
+	# require permission
+	some_query: some_result @prefix_checkPerm(perms: ["foo"])
+	# require multiple permissions
+	some_query: some_result @prefix_checkPerm(perms: ["foo", "bar"])
+	# pull in binding information
+	some_query: some_result @prefix_checkPerm(bindings: { node_types : ["dms.accounts"] })
+	some_query: some_result @prefix_checkPerm(bindings: { perms : ["dms.accounts.read", "dms.accounts.write"] })
+	some_query: some_result @prefix_checkPerm(bindings: { node_types : ["dms.accounts", "dms.groups"], perms : ["dms.accounts.read", "dms.accounts.write", "dms.accounts.remove"] })
 }
 ```
 
@@ -460,9 +522,6 @@ This section is provided to provide additional information about the GraphQL end
 		}
 	}
 	```
-
-
-
 
 # Development
 

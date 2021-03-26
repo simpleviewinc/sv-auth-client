@@ -1,7 +1,10 @@
 const { SchemaDirectiveVisitor } = require("graphql-tools");
+const { gql } = require("apollo-server");
+const { defaultFieldResolver } = require("graphql");
+
 const AuthClient = require("./AuthClient");
 
-function getDirectiveGetUser(graphUrl){
+function getDirectiveGetUser({ name, graphUrl }){
 	const authClient = new AuthClient({ graphUrl });
 	
 	class DirectiveGetUser extends SchemaDirectiveVisitor {
@@ -35,7 +38,16 @@ function getDirectiveGetUser(graphUrl){
 		}
 	}
 
-	return DirectiveGetUser
+	return {
+		schemaDirectives : {
+			[name] : DirectiveGetUser
+		},
+		typeDefs : gql`
+			directive @${name}(
+				acct_id: String
+			) on FIELD_DEFINITION
+		`
+	}
 }
 
 module.exports = getDirectiveGetUser;

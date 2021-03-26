@@ -8,7 +8,7 @@ Ensure the following package dependencies are installed in your containers that 
 
 Permissions are registered to the unique combination of product and account in the Auth System. This is because not all accounts have the same features across a product and thus possible permissions may vary from account to account. When declaring permissions for an account/product object, entirety is defined via SV-Auth's `admin.products_usert` endpoint. This call should be made anytime the possible permissions for an account's product have changed. Additionally, this request requires a user token to be valid.
 
-```javascript
+```js
 	const { AdminPrefix } = require("@simpleview/sv-auth-client");
 	const { GraphServer } = require("@simpleview/sv-graphql-client");
 	const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AdminPrefix] });
@@ -53,7 +53,6 @@ Some important things to note are:
 - Permission groups can be nested infinitely.
 - Only permTypes `read`, `write`, and `remove` are valid.
 
-
 ## Authenticating a User and Checking Permssions (Server-Side)
 In order to integrate authentication with your graphQL resolves you will need to convert the `Authentication: Bearer` token into a `User` with permissions.
 
@@ -73,65 +72,13 @@ const server = new ApolloServer({
 });
 ```
 
-2. In most cases you'll want the root of your prefix to enforce the acct_id. It can be done with the following.
+2. Add an acct_id filter to your prefix, and use it to retrieve a `User` reference based on the passed in token.
 
-The `graphUrl` will depend on what auth server you are authenticating. In general the live server will be `graphql.simpleviewinc.com` but for bleeding edge features you may need to access other urls.
+The best way to do this is using `DirectiveGetUser` and filtering by acct_id at your root resolver. This will convert the incoming token into a user on your context. See usage instructions in the main readme.
 
-```javascript
-const { AuthClient, getTokenFromHeaders } = require("@simpleview/sv-auth-client");
-const authClient = new AuthClient({ graphUrl : "https://graphql.simpleviewinc.com/" });
-```
+3. Enforce permissions on specific resolvers.
 
-You can convert the token into a user, ensuring they are logged into the Auth-System with the following code snippet:
-
-When this function is executed it will take a token on the context, and convert it into a user on the context, or throw a permission error.
-
-```javascript
-async function processToken(acct_id, context) {
-	if (context.token === undefined) {
-		throw new AuthenticationError("User is not authorized to access this resource.");
-	}
-	
-	const user = await authClient.getUser({
-		acct_id,
-		token : context.token
-	});
-
-	if (user === undefined) {
-		throw new AuthenticationError("User is not authorized to access this resource.");
-	}
-	
-	context.user = user;
-}
-```
-
-Utilize the `processToken` method in your root resolver for both query and mutation. Since `processToken` is called here any resolver deeper in the tree will have access to `context.user`.
-
-```javascript
-	const resolvers = {
-		Query : {
-			async MYPREFIX(parent, { acct_id }, context, info) {
-				await processToken(acct_id, context);
-				
-				return {};
-			}
-		}
-		...
-	}
-```
-
-3. For endpoints that require a certain permission, user permissions can be checked via `context.user.can()` which takes an array of permission strings. 
-
-```javascript
-// resolver that requires permissions
-async soemthing_that_requires_perms(parent, { acct_id }, { user }, info) {
-	if (!user.can(["permission.name.here", "permission.another.here"])) {
-		throw new Error("User lacks permission.")
-	}
-
-	// user has permission, do something...
-}
-```
+To do this utilize the `DirectiveCheckPerm` on the various resolvers throughout your project. See usage instructions in the main readme.
 
 ## Authenticating a User and Checking Permssions (Client-Side)
 
