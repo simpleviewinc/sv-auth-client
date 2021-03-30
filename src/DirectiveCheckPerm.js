@@ -28,6 +28,17 @@ function getDirectiveCheckPerm({ name, graphUrl }) {
 				}
 
 				if (directiveArgs.bindings !== undefined) {
+					const headers = {};
+
+					if (context.headers) {
+						const allowedHeaders = ["x-sv-object-bindings"];
+						for(let header of allowedHeaders) {
+							if (context.headers[header]) {
+								headers[header] = context.headers[header];
+							}
+						}
+					}
+
 					const bindings = await graphServer.admin.object_bindings_mine({
 						filter : directiveArgs.bindings,
 						fields : `
@@ -37,7 +48,8 @@ function getDirectiveCheckPerm({ name, graphUrl }) {
 						context : {
 							acct_id : context.user.acct_id,
 							token : context.token
-						}
+						},
+						headers
 					});
 
 					if (bindings.success === false) {

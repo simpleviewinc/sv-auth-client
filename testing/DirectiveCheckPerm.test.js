@@ -285,4 +285,82 @@ describe(__filename, function() {
 
 		assert.deepStrictEqual(result, { withUser : { get_bindings_node_types : { message : JSON.stringify({ "cms.assets.images.read" : { "node.type.a" : ["id1"] } }) } } });
 	});
+
+	it("should allow overwrite based on header", async function() {
+		const result = await query({
+			url : graphUrl,
+			query : `
+				query {
+					withUser(acct_id : "test-0") {
+						get_bindings_perms {
+							message
+						}
+					}
+				}
+			`,
+			token : testServers.authGraphServer.context.token,
+			headers : {
+				"x-sv-object-bindings" : JSON.stringify({ overwrite : true })
+			}
+		});
+
+		assert.deepStrictEqual(result, {
+			withUser : {
+				get_bindings_perms : {
+					message : JSON.stringify({ "overwrite" : true })
+				}
+			}
+		});
+	});
+
+	it("should not allow overwrite if using regular token", async function() {
+		const result = await query({
+			url : graphUrl,
+			query : `
+				query {
+					withUser(acct_id : "test-0") {
+						get_bindings_perms {
+							message
+						}
+					}
+				}
+			`,
+			token : testServers.acct0test0.context.token,
+			headers : {
+				"x-sv-object-bindings" : JSON.stringify({ overwrite : true })
+			}
+		});
+
+		assert.deepStrictEqual(result, {
+			withUser : {
+				get_bindings_perms : {
+					message : JSON.stringify({ "admin.access" : true, "admin.read" : true })
+				}
+			}
+		});
+	});
+
+	it("should get bindings for perms with sv user", async function() {
+		const result = await query({
+			url : graphUrl,
+			query : `
+				query {
+					withUser(acct_id : "test-0") {
+						get_bindings_perms {
+							message
+						}
+					}
+				}
+			`,
+			token : testServers.authGraphServer.context.token
+		});
+
+		assert.deepStrictEqual(result, {
+			withUser : {
+				get_bindings_perms : {
+					message : JSON.stringify({ "admin.access" : true, "admin.read" : true })
+				}
+			}
+		});
+	});
 });
