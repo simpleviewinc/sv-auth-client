@@ -56,7 +56,7 @@ function getDirectiveCheckPerm({ name, graphUrl }) {
 						throw new Error("Unable to retrieve user bindings.");
 					}
 
-					context.bindings = bindings.permissionObj;
+					context.user.permissionObjBindings = bindings.permissionObj;
 				}
 				
 				return await resolve.call(this, parent, args, context, info);

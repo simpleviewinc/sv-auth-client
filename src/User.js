@@ -1,8 +1,14 @@
+const { canIds } = require("./utils");
+
 class User {
 	constructor(args) {
 		Object.assign(this, args);
 		
 		this.permissionObj = JSON.parse(this.permissionJson);
+		/**
+		 * @type {import("./types").ObjectBindingsPermissionObj}
+		 */
+		this.permissionObjBindings;
 	}
 	can(perms) {
 		var allowed = [];
@@ -31,6 +37,14 @@ class User {
 		}
 		
 		return allowed.indexOf(false) === -1;
+	}
+	/**
+	 * Return what objects a user has this permission for the given node type
+	 * @param {string} perm 
+	 * @param {string} node_type 
+	 */
+	canIds(perm, node_type) {
+		return canIds(perm, node_type, this.permissionObjBindings);
 	}
 	toJSON() {
 		var temp = Object.assign({}, this);

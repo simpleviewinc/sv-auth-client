@@ -23,8 +23,10 @@ For integrating your project with auth, please see the [Setup Instructions](setu
 # Package API
 
 * [AuthClient](#AuthClient)
+* [canIds](#canIds)
 * [DirectiveGetUser](#DirectiveGetUser)
 * [DirectiveCheckPerm](#DirectiveCheckPerm)
+* [User](#User)
 
 ## AuthClient
 
@@ -93,6 +95,10 @@ const { AuthPrefix } = require("@simpleview/sv-auth-client");
 const { GraphServer } = require("@simpleview/sv-graphql-client");
 const graphServer = new GraphServer({ graphUrl : GRAPH_URL, prefixes : [AuthPrefix] });
 ```
+
+## canIds(perm, node_type, bindings)
+
+This function is identical to `User.canIds` but requires you to pass in the `bindings` manually, it should only be used in cases where you cannot use `DirectiveCheckPerm`. See the documentation for `User.canIds` for how it functions.
 
 ## DirectiveGetUser
 
@@ -206,6 +212,37 @@ user.can(["some.perm.name"]);
 
 ```js
 const allow = user.can(["cms.something.another", "cms.another.permission"]);
+```
+
+### User.canIds
+
+This function is used for assisting in filtering down queries based on what IDs a user has access to for a given permission and node_type. In order to use this function you must specify `bindings` in the `DirectiveCheckPerm` for the graphql endpoint being executed. If you are not using that mechanic, then use the generic `canIds` function rather than the `User.canIds` variant.
+
+Returns `true` if the user has root access to this permission/node_type.
+
+Returns `false` if the user lacks all access to this permission/node_type. Note, that lacking access to this permission does not mean the user cannot see any of the content type, as they may have permissions to a node_type higher in the hierarchy.
+
+Returns `string[]` of ids if the user has object bindings.
+
+* perm - string - Name of the permission
+* node_type - string - Name of the node_type to return the ids for.
+
+```js
+const account_ids = user.canIds("dms.accounts.read", "dms.account");
+const group_ids = user.canIds("dms.accounts.read", "dms.group");
+
+const result = await sqlQuery(`
+	SELECT * FROM accounts a
+	WHERE
+		(
+			@account_ids is null OR account_id IN (@account_ids)
+			OR
+			@group_ids is null OR group_id IN (@group_ids)
+		)
+`, {
+	account_ids : account_ids === true ? null : account_ids,
+	group_ids : group_ids === true ? null : group_ids
+})
 ```
 
 ### User.toPlain

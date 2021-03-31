@@ -292,4 +292,37 @@ describe(__filename, function() {
 			assert.strictEqual(result, test.allow);
 		});
 	});
+
+	describe("User.canIds", function() {
+		const tests = [
+			{
+				name : "return false on no bindings",
+				args : {
+					perm : "foo",
+					node_type : "bar",
+					result : false
+				}
+			},
+			{
+				name : "return the value of a binding",
+				args : {
+					perm : "foo",
+					node_type : "bar",
+					bindings : { foo : { bar : ["1", "2"] } },
+					result : ["1", "2"]
+				}
+			}
+		];
+
+		mochaLib.testArray(tests, function(test) {
+			const user = new User({
+				permissionJson : "{}",
+				permissionObjBindings : test.bindings
+			});
+
+			const result = user.canIds(test.perm, test.node_type);
+
+			assert.deepStrictEqual(result, test.result);
+		});
+	});
 });

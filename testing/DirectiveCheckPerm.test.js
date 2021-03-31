@@ -65,10 +65,10 @@ const resolvers = {
 			return { message : "enforce_perms" }
 		},
 		get_bindings_perms : function(parent, args, context, info) {
-			return { message : JSON.stringify(context.bindings) }
+			return { message : JSON.stringify(context.user.permissionObjBindings) }
 		},
 		get_bindings_node_types : function(parent, args, context, info) {
-			return { message : JSON.stringify(context.bindings) }
+			return { message : JSON.stringify(context.user.permissionObjBindings) }
 		}
 	}
 }
