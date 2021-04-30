@@ -1,4 +1,5 @@
 const Accounts = require("./auth/Accounts");
+const OauthClients = require("./auth/OauthClients");
 const TestItems = require("./auth/TestItems");
 const { query, nullToUndefined } = require("@simpleview/sv-graphql-client");
 
@@ -14,7 +15,13 @@ class AuthPrefix {
 			name : "accounts",
 			graphServer
 		});
-		
+
+		this._oauthClients = new OauthClients({
+			graphUrl,
+			name : "oauth_clients",
+			graphServer
+		});
+
 		this._testItems = new TestItems({
 			graphUrl,
 			name : "test_items",
@@ -77,6 +84,15 @@ class AuthPrefix {
 		nullToUndefined(returnData);
 
 		return returnData;
+	}
+	async oauth_clients(...args) {
+		return this._oauthClients.find(...args);
+	}
+	async oauth_clients_upsert(...args) {
+		return this._oauthClients.upsert(...args);
+	}
+	async oauth_clients_remove(...args) {
+		return this._oauthClients.remove(...args);
 	}
 	async current({ acct_id, fields, context }) {
 		context = context || this._graphServer.context;

@@ -1,4 +1,3 @@
-const OauthClients = require("./admin/OauthClients");
 const ObjectBindings = require("./admin/ObjectBindings");
 const Products = require("./admin/Products");
 const Roles = require("./admin/Roles");
@@ -6,7 +5,6 @@ const Users = require("./admin/Users");
 const { query, nullToUndefined } = require("@simpleview/sv-graphql-client");
 
 const apis = {
-	oauth_clients : OauthClients,
 	object_bindings : ObjectBindings,
 	products : Products,
 	roles : Roles,
