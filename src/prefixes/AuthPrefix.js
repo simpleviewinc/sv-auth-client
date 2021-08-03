@@ -88,7 +88,7 @@ class AuthPrefix {
 	async accounts_email_setup({ fields, context }) {
 		context = context || this._graphServer.context;
 
-		const result = await query({
+		return await query({
 			query : `
 				mutation {
 					auth {
@@ -99,14 +99,10 @@ class AuthPrefix {
 				}
 			`,
 			url : this._graphUrl,
-			token : context.token
+			token : context.token,
+			key : "auth.accounts_email_setup",
+			clean : true
 		});
-
-		const returnData = result.auth.accounts_email_setup;
-		
-		nullToUndefined(returnData);
-
-		return returnData;
 	}
 	async oauth_clients(...args) {
 		return this._oauthClients.find(...args);
