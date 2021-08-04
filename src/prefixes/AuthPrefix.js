@@ -85,6 +85,23 @@ class AuthPrefix {
 
 		return returnData;
 	}
+	async accounts_email_setup({ fields, context = this._graphServer.context }) {
+		return query({
+			query : `
+				mutation {
+					auth {
+						accounts_email_setup {
+							${fields}
+						}
+					}
+				}
+			`,
+			url : this._graphUrl,
+			token : context.token,
+			key : "auth.accounts_email_setup",
+			clean : true
+		});
+	}
 	async oauth_clients(...args) {
 		return this._oauthClients.find(...args);
 	}
