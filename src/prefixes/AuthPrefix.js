@@ -85,10 +85,8 @@ class AuthPrefix {
 
 		return returnData;
 	}
-	async accounts_email_setup({ fields, context }) {
-		context = context || this._graphServer.context;
-
-		return await query({
+	async accounts_email_setup({ fields, context = this._graphServer.context }) {
+		return query({
 			query : `
 				mutation {
 					auth {
