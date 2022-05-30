@@ -23,7 +23,7 @@ describe(__filename, function() {
 
 	it("oauth2CreateLoginUrl should create url", async () => {
 		const result = oauth2CreateLoginUrl({
-			auth_url: "https://auth.kube.simpleview.io/",
+			authUrl: "https://auth.kube.simpleview.io/",
 			client_id: "cms",
 			redirect_uri: "https://test.simpleviewcms.com/oauth2/callback/",
 			redirectUrl: "http://test.simpleviewcms.com/",
