@@ -91,6 +91,13 @@ describe(__filename, function() {
 				}
 			},
 			{
+				name: "return true for test url",
+				args: {
+					authUrl: "http://sv-auth-pull-0-ui-service.default.svc.cluster.local/",
+					result: true
+				}
+			},
+			{
 				name: "throw error for url not in list",
 				args: {
 					authUrl: "https://auth.invalid.simpleviewinc.com/",
