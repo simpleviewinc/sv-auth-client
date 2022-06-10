@@ -1,9 +1,15 @@
 const assert = require("assert");
+const { testArray } = require("@simpleview/mochalib");
 
 const {
+	oauth2AuthorizeCode,
 	oauth2CreateKeyHash,
 	oauth2CreateLoginUrl,
-	oauth2CreateRandomKey
+	oauth2CreateRandomKey,
+	oauth2GetNewTokens,
+	oauth2GetToken,
+	oauth2Login,
+	oauth2RefreshToken
 } = require("../src/oauth2");
 
 describe(__filename, function() {
@@ -36,5 +42,57 @@ describe(__filename, function() {
 		});
 
 		assert.strictEqual(result, "https://auth.kube.simpleview.io/oauth2/login/?response_type=code&code_challenge_method=S256&client_id=cms&redirect_uri=https%3A%2F%2Ftest.simpleviewcms.com%2Foauth2%2Fcallback%2F%3FredirectUrl%3Dhttp%253A%252F%252Ftest.simpleviewcms.com%252F&state=teststate&code_challenge=n4bQgYhMfWWaL%2BqgxVrQFaO%2FTxsrC4Is0V1sFbDwCgg%3D&sv_auth_params=%7B%22acct_id%22%3A9132%2C%22product%22%3A%22cms%22%7D");
+	});
+
+	describe("functions should throw error with invalid authUrl", function() {
+		const tests = [
+			{
+				name: "oauth2AuthorizeCode",
+				args: {
+					query: async () => oauth2AuthorizeCode({ authUrl: "https://auth.invalid.simpleviewinc.com" })
+				}
+			},
+			{
+				name: "oauth2CreateLoginUrl",
+				args: {
+					query: () => oauth2CreateLoginUrl({ authUrl: "https://auth.invalid.simpleviewinc.com" })
+				}
+			},
+			{
+				name: "oauth2GetToken",
+				args: {
+					query: async () => oauth2GetToken({ authUrl: "https://auth.invalid.simpleviewinc.com" })
+				}
+			},
+			{
+				name: "oauth2GetNewTokens",
+				args: {
+					query: async () => oauth2GetNewTokens({ authUrl: "https://auth.invalid.simpleviewinc.com" })
+				}
+			},
+			{
+				name: "oauth2Login",
+				args: {
+					query: () => oauth2Login({ authUrl: "https://auth.invalid.simpleviewinc.com" })
+				}
+			},
+			{
+				name: "oauth2RefreshToken",
+				args: {
+					query: async () => oauth2RefreshToken({ authUrl: "https://auth.invalid.simpleviewinc.com" })
+				}
+			},
+		];
+
+		testArray(tests, async function(test) {
+			try {
+				await test.query();
+			} catch (e) {
+				assert.strictEqual(e.message, "authUrl must be one of https://auth.simpleviewinc.com/, https://auth.dev.simpleviewinc.com/, https://auth.qa.simpleviewinc.com/, https://auth.kube.simpleview.io/");
+				return;
+			}
+
+			assert.strictEqual(true, false);
+		});
 	});
 });
