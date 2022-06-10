@@ -30,7 +30,7 @@ function validateAuthUrl(authUrl) {
 		"https://auth.kube.simpleview.io/"
 	]
 	
-	if (validUrls.indexOf(authUrl) === -1) {
+	if (validUrls.indexOf(authUrl) === -1 && !/http[^.]+\.ui-service\.default\.svc\.cluster\.local/.test(authUrl)) {
 		throw new Error("authUrl must be one of " + validUrls.join(", "));
 	}
 
