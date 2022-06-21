@@ -5,6 +5,7 @@ const {
 const getDirectiveCheckPerm = require("./DirectiveCheckPerm");
 const getDirectiveGetUser = require("./DirectiveGetUser");
 const oauth2 = require("./oauth2");
+const Oauth2Express = require("./Oauth2Express");
 
 module.exports = {
 	...browser,
@@ -12,4 +13,5 @@ module.exports = {
 	getDirectiveCheckPerm,
 	getDirectiveGetUser,
 	...oauth2,
+	Oauth2Express
 }

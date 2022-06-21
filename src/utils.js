@@ -1,4 +1,20 @@
 /**
+ * This function ensures that thrown errors from an async express handler are caught and properly passed on to next().
+ * @param {import("./definitions").AsyncHandler} fn
+ * */
+ const asyncWrapper = function(fn) {
+	const handler = async function(req, res, next) {
+		try {
+			await fn(req, res, next);
+		} catch (e) {
+			next(e);
+		}
+	}
+
+	return handler;
+}
+
+/**
  * Return what objects a user has this permission for the given node type
  * @param {string} perm
  * @param {string} node_type
@@ -22,20 +38,5 @@ function canIds(perm, node_type, bindings = {}) {
 	return nodeData;
 }
 
-function validateAuthUrl(authUrl) {
-	const validUrls = [
-		"https://auth.simpleviewinc.com/",
-		"https://auth.dev.simpleviewinc.com/",
-		"https://auth.qa.simpleviewinc.com/",
-		"https://auth.kube.simpleview.io/"
-	]
-	
-	if (validUrls.indexOf(authUrl) === -1 && !/http[^.]+.ui-service.default.svc.cluster.local/.test(authUrl)) {
-			throw new Error("authUrl must be one of " + validUrls.join(", "));
-	}
-
-	return true;
-}
-
+module.exports.asyncWrapper = asyncWrapper;
 module.exports.canIds = canIds;
-module.exports.validateAuthUrl = validateAuthUrl;
