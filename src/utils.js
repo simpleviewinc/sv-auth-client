@@ -1,20 +1,4 @@
 /**
- * This function ensures that thrown errors from an async express handler are caught and properly passed on to next().
- * @param {import("./definitions").AsyncHandler} fn
- * */
- const asyncWrapper = function(fn) {
-	const handler = async function(req, res, next) {
-		try {
-			await fn(req, res, next);
-		} catch (e) {
-			next(e);
-		}
-	}
-
-	return handler;
-}
-
-/**
  * Return what objects a user has this permission for the given node type
  * @param {string} perm
  * @param {string} node_type
@@ -38,5 +22,4 @@ function canIds(perm, node_type, bindings = {}) {
 	return nodeData;
 }
 
-module.exports.asyncWrapper = asyncWrapper;
 module.exports.canIds = canIds;

@@ -6,7 +6,7 @@ const AuthClient = require("./AuthClient");
 
 function getDirectiveGetUser({ name, graphUrl }){
 	const authClient = new AuthClient({ graphUrl });
-	
+
 	class DirectiveGetUser extends SchemaDirectiveVisitor {
 		visitFieldDefinition(field) {
 			const { resolve = defaultFieldResolver } = field;

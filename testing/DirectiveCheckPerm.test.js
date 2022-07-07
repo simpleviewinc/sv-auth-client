@@ -94,7 +94,7 @@ describe(__filename, function() {
 		this.timeout(5000);
 
 		await testServers.init();
-		
+
 		await server.listen().then(({ url }) => {
 			graphUrl = url;
 		});

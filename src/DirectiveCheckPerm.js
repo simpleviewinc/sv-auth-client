@@ -18,7 +18,7 @@ function getDirectiveCheckPerm({ name, graphUrl }) {
 				if (directiveArgs.sv === true && context.user.sv !== true) {
 					throw new Error("User is not authorized to access this resource (ERR: 1005).");
 				}
-				
+
 				// check if the resolver requires specific permissions
 				if (directiveArgs.perms !== undefined) {
 					const allowed = context.user.can(directiveArgs.perms);
@@ -58,7 +58,7 @@ function getDirectiveCheckPerm({ name, graphUrl }) {
 
 					context.user.permissionObjBindings = bindings.permissionObj;
 				}
-				
+
 				return await resolve.call(this, parent, args, context, info);
 			}
 		}
