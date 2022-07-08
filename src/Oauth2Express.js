@@ -78,7 +78,7 @@ async function middleware(req, res, next) {
 	const oauth2 = session?.oauth2;
 
 	// If we don't have a token or a refresh_token than we need to redirect to Auth to log the user in
-	if (!oauth2) {
+	if (!oauth2 || oauth2.type === "initial") {
 		if (req.method !== "GET") {
 			throw new Error("User is not authorized to access this resource.");
 		}
@@ -107,10 +107,6 @@ async function middleware(req, res, next) {
 		});
 
 		return res.redirect(302, loginUrl);
-	}
-
-	if (oauth2.type === "initial") {
-		throw new Error("Invalid session state.");
 	}
 
 	if (oauth2.type === "logged_in") {

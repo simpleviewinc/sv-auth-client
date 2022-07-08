@@ -1,3 +1,4 @@
+//@ts-check
 const express = require("express");
 const supertest = require("supertest");
 const cookieSession = require("cookie-session");
@@ -93,6 +94,45 @@ describe(__filename, function() {
 				code_challenge_method: "S256",
 				client_id: "cms",
 				redirect_uri: "http://127.0.0.1/oauth2/callback/?redirectUrl=http%3A%2F%2F127.0.0.1%2F",
+				state: sessionData.oauth2.state,
+				code_challenge: oauth2CreateKeyHash(sessionData.oauth2.code_verifier)
+			}, {
+				allowExtraKeys: false
+			});
+		});
+
+		it("should redirect if the session is in the initial state", async function() {
+			/** @type {{ oauth2: import("../src/types").InitialSession }} */
+			const initialSession = {
+				oauth2: {
+					type: "initial",
+					state: "something",
+					code_verifier: "bogus"
+				}
+			}
+			const result = await supertest(app)
+				.get("/?withParam=true")
+				.set("Cookie", getHeaderFromSession(initialSession));
+
+			const sessionData = getSessionFromHeaders(result.headers);
+
+			deepCheck(sessionData, {
+				oauth2: {
+					type: "initial",
+					state: { type: "string" },
+					code_verifier: { type: "string" }
+				}
+			});
+
+			assert.notStrictEqual(initialSession.oauth2.state, sessionData.oauth2.state);
+			assert.notStrictEqual(initialSession.oauth2.code_verifier, sessionData.oauth2.code_verified);
+
+			const url = new URL(result.headers.location);
+			deepCheck(Object.fromEntries(url.searchParams), {
+				response_type: "code",
+				code_challenge_method: "S256",
+				client_id: "cms",
+				redirect_uri: "http://127.0.0.1/oauth2/callback/?redirectUrl=http%3A%2F%2F127.0.0.1%2F%3FwithParam%3Dtrue",
 				state: sessionData.oauth2.state,
 				code_challenge: oauth2CreateKeyHash(sessionData.oauth2.code_verifier)
 			}, {
