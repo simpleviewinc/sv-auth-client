@@ -45,6 +45,12 @@ app.get("/no_auth/", function(req, res) {
 	res.send("none");
 });
 
+app.use(function(err, res, res, next) {
+	res.status(500).json({
+		message: err.message
+	});
+});
+
 oauth2.applyMiddleware(app);
 
 function getSessionFromHeaders(headers) {
@@ -91,6 +97,14 @@ describe(__filename, function() {
 				code_challenge: oauth2CreateKeyHash(sessionData.oauth2.code_verifier)
 			}, {
 				allowExtraKeys: false
+			});
+		});
+
+		it("should error on post request if no session", async function() {
+			const result = await supertest(app).post("/");
+			assert.strictEqual(result.statusCode, 500);
+			assert.deepStrictEqual(result.body, {
+				message: "User is not authorized to access this resource."
 			});
 		});
 

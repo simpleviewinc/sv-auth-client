@@ -79,6 +79,10 @@ async function middleware(req, res, next) {
 
 	// If we don't have a token or a refresh_token than we need to redirect to Auth to log the user in
 	if (!oauth2) {
+		if (req.method !== "GET") {
+			throw new Error("User is not authorized to access this resource.");
+		}
+
 		/** @type {import("./types").InitialSession} */
 		const newAuth = {
 			type: "initial",
