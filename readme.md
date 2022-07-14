@@ -1,3 +1,5 @@
+REPO MOVED into sv-auth, still on npm @simpleview/sv-auth-client .
+
 # sv-auth-client
 
 Client for communicating with sv-auth. This npm package contains classes and helpers for communicating with the sv-auth graphQL system.
